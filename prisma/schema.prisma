@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model TrackedCity {
+  id        String   @id @default(cuid())
+  citySlug  String   @unique
+  createdAt DateTime @default(now())
+}
+
+model PlaceSnapshot {
+  id          String   @id @default(cuid())
+  placeId     String
+  citySlug    String
+  name        String
+  rating      Float
+  reviewCount Int
+  snappedAt   DateTime @default(now())
+
+  @@index([citySlug, snappedAt])
+  @@index([placeId, snappedAt])
+}
+
+model CuratedPlace {
+  id          String   @id @default(cuid())
+  placeId     String
+  citySlug    String
+  category    String?
+  name        String
+  rating      Float
+  reviewCount Int
+  primaryType String
+  score       Float
+  reason      String
+  rank        Int
+  curatedAt   DateTime @default(now())
+
+  @@index([citySlug, category, curatedAt])
+}
