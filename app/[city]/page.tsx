@@ -25,14 +25,14 @@ export default async function CityPage({ params }: Props) {
 
         <Tabs defaultValue="cafe">
           <TabsList className="w-full grid grid-cols-4 mb-6">
-            <TabsTrigger value="cafe">Coffee</TabsTrigger>
+            <TabsTrigger value="cafe">Cafés</TabsTrigger>
             <TabsTrigger value="bar">Bars</TabsTrigger>
             <TabsTrigger value="restaurant">Restaurants</TabsTrigger>
             <TabsTrigger value="curated">People Love</TabsTrigger>
           </TabsList>
 
           <TabsContent value="cafe">
-            <SectionHeader title={`Top Coffee in ${city.name}`} subtitle="Highest rated cafes" />
+            <SectionHeader title={`Top Cafés in ${city.name}`} subtitle="Highest rated cafés" />
             <PlaceList category="cafe" citySlug={city.slug} />
           </TabsContent>
 
