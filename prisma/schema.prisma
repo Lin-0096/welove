@@ -38,6 +38,8 @@ model CuratedPlace {
   score       Float
   reason      String
   rank        Int
+  weeklyHours String[] @default([])
+  specialDays String[] @default([])
   curatedAt   DateTime @default(now())
 
   @@index([citySlug, category, curatedAt])

@@ -15,6 +15,7 @@ export interface Place {
   isOpenNow: boolean | null;
   todayHours: string | null;
   weeklyHours: string[] | null;
+  specialDays: string[] | null;
 }
 
 const CATEGORY_QUERY: Record<PlaceCategory, string> = {
@@ -53,6 +54,26 @@ function mapPlace(raw: Record<string, unknown>): Place {
     }
   }
 
+  // Special days (public holidays with modified hours)
+  const rawSpecialDays = (hours?.specialDays as Array<Record<string, unknown>>) ?? null;
+  let specialDays: string[] | null = null;
+  if (rawSpecialDays && rawSpecialDays.length > 0) {
+    const today = new Date();
+    const in7Days = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+    specialDays = rawSpecialDays
+      .filter((d) => {
+        const date = d.date as { year: number; month: number; day: number } | undefined;
+        if (!date) return false;
+        const dt = new Date(date.year, date.month - 1, date.day);
+        return dt >= today && dt <= in7Days;
+      })
+      .map((d) => {
+        const date = d.date as { year: number; month: number; day: number };
+        return `${date.year}-${String(date.month).padStart(2, "0")}-${String(date.day).padStart(2, "0")}`;
+      });
+    if (specialDays.length === 0) specialDays = null;
+  }
+
   return {
     id: raw.id as string,
     name: (raw.displayName as { text: string })?.text ?? "Unknown",
@@ -63,6 +84,7 @@ function mapPlace(raw: Record<string, unknown>): Place {
     isOpenNow,
     todayHours,
     weeklyHours: weekdayDescriptions,
+    specialDays,
   };
 }
 

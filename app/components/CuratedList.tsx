@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { OpeningHours } from "./OpeningHours";
 
 interface CuratedPlace {
   placeId: string;
@@ -13,6 +14,8 @@ interface CuratedPlace {
   score: number;
   reason: string;
   rank: number;
+  weeklyHours: string[];
+  specialDays: string[];
 }
 
 interface Props {
@@ -82,10 +85,10 @@ function deriveTags(place: CuratedPlace): string[] {
   const tags: string[] = [];
   if (typeLabel.trim()) tags.push(typeLabel);
 
-  if (place.reviewCount <= 80) tags.push("Hidden Gem");
-  else if (place.reviewCount <= 250) tags.push("Local Favorite");
+  if (place.reviewCount <= 300) tags.push("Hidden Gem");
+  else if (place.reviewCount <= 1000) tags.push("Local Favorite");
 
-  if (place.score >= 80) tags.push("Must Visit");
+  if (place.score >= 65) tags.push("Must Visit");
 
   return tags;
 }
@@ -115,6 +118,7 @@ function CuratedCard({ place }: { place: CuratedPlace }) {
               ))}
             </div>
             <p className="text-sm text-foreground/80 mt-1.5 leading-snug">{place.reason}</p>
+            <OpeningHours weeklyHours={place.weeklyHours} specialDays={place.specialDays} />
           </div>
         </div>
       </CardContent>

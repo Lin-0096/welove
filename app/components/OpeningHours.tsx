@@ -1,44 +1,114 @@
 "use client";
 
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
 
 interface Props {
-  isOpenNow: boolean | null;
-  todayHours: string | null;
-  weeklyHours: string[] | null;
+  weeklyHours: string[];
+  specialDays: string[];
 }
 
-export function OpeningHours({ isOpenNow, todayHours, weeklyHours }: Props) {
-  const [expanded, setExpanded] = useState(false);
+function getTodayHours(weeklyHours: string[]): string | null {
+  if (!weeklyHours.length) return null;
+  const dayIndex = new Date().getDay(); // 0=Sun
+  const googleDay = dayIndex === 0 ? 6 : dayIndex - 1; // 0=Mon, 6=Sun
+  const entry = weeklyHours[googleDay];
+  return entry ? entry.replace(/^[^:]+:\s*/, "") : null;
+}
+
+function parseTime12h(t: string): number | null {
+  const m = t.trim().match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if (!m) return null;
+  let h = parseInt(m[1]);
+  const mins = parseInt(m[2]);
+  const ampm = m[3].toUpperCase();
+  if (ampm === "PM" && h !== 12) h += 12;
+  if (ampm === "AM" && h === 12) h = 0;
+  return h * 60 + mins;
+}
+
+function computeIsOpen(todayHours: string | null): boolean | null {
+  if (!todayHours) return null;
+  const lower = todayHours.toLowerCase();
+  if (lower === "closed") return false;
+  if (lower.includes("24 hours")) return true;
+  const parts = todayHours.split(/\s*[–\-]\s*/);
+  if (parts.length !== 2) return null;
+  const open = parseTime12h(parts[0]);
+  const close = parseTime12h(parts[1]);
+  if (open === null || close === null) return null;
+  const now = new Date();
+  const cur = now.getHours() * 60 + now.getMinutes();
+  return close > open ? cur >= open && cur < close : cur >= open || cur < close;
+}
+
+function getUpcomingSpecialDays(specialDays: string[]): string[] {
+  if (!specialDays.length) return [];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const in7Days = new Date(today.getTime() + 7 * 86400000);
+  return specialDays.filter((d) => {
+    const dt = new Date(d);
+    return dt >= today && dt <= in7Days;
+  });
+}
+
+export function OpeningHours({ weeklyHours, specialDays }: Props) {
+  const [showAll, setShowAll] = useState(false);
+
+  if (!weeklyHours.length) return null;
+
+  const todayHours = getTodayHours(weeklyHours);
+  const isOpen = computeIsOpen(todayHours);
+  const upcomingSpecialDays = getUpcomingSpecialDays(specialDays);
+  const todayGoogleIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
 
   return (
-    <div className="mt-2 text-sm">
-      <div className="flex items-center gap-2 flex-wrap">
-        {isOpenNow !== null && (
-          <Badge variant={isOpenNow ? "default" : "secondary"} className="text-xs">
-            {isOpenNow ? "Open now" : "Closed"}
-          </Badge>
-        )}
-        {todayHours ? (
-          <span className="text-muted-foreground">{todayHours}</span>
+    <div className="mt-2">
+      <div className="flex items-center gap-2">
+        {/* Status dot */}
+        {isOpen === true ? (
+          <span className="relative flex h-2 w-2 shrink-0">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+          </span>
+        ) : isOpen === false ? (
+          <span className="inline-flex rounded-full h-2 w-2 shrink-0 bg-red-400" />
         ) : (
-          <span className="text-muted-foreground text-xs">Hours unavailable</span>
+          <span className="inline-flex rounded-full h-2 w-2 shrink-0 bg-muted-foreground/25" />
         )}
-        {weeklyHours && weeklyHours.length > 0 && (
-          <button
-            onClick={() => setExpanded((v) => !v)}
-            className="text-xs text-blue-500 hover:underline ml-auto"
-          >
-            {expanded ? "Hide hours" : "All hours"}
-          </button>
-        )}
+
+        <span className="text-xs text-muted-foreground leading-none">
+          {todayHours ?? "No hours info"}
+        </span>
+
+        <button
+          onClick={() => setShowAll((v) => !v)}
+          className="text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors ml-auto leading-none"
+          aria-label={showAll ? "Hide weekly hours" : "Show weekly hours"}
+        >
+          {showAll ? "▲" : "▼"}
+        </button>
       </div>
 
-      {expanded && weeklyHours && (
-        <ul className="mt-2 space-y-0.5 text-xs text-muted-foreground bg-muted/40 rounded p-2">
+      {upcomingSpecialDays.length > 0 && (
+        <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+          Special hours upcoming ({upcomingSpecialDays.map((d) => d.slice(5).replace("-", "/")).join(", ")})
+        </p>
+      )}
+
+      {showAll && (
+        <ul className="mt-2 space-y-0.5 text-xs bg-muted/40 rounded-md p-2.5">
           {weeklyHours.map((line, i) => (
-            <li key={i}>{line}</li>
+            <li
+              key={i}
+              className={
+                i === todayGoogleIdx
+                  ? "font-medium text-foreground"
+                  : "text-muted-foreground"
+              }
+            >
+              {line}
+            </li>
           ))}
         </ul>
       )}

@@ -56,9 +56,8 @@ export function PlaceCard({ place, rank }: Props) {
         </div>
 
         <OpeningHours
-          isOpenNow={place.isOpenNow}
-          todayHours={place.todayHours}
-          weeklyHours={place.weeklyHours}
+          weeklyHours={place.weeklyHours ?? []}
+          specialDays={place.specialDays ?? []}
         />
       </CardContent>
     </Card>

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { PlaceCategory } from "@/lib/google-places";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { OpeningHours } from "./OpeningHours";
 
 interface CuratedPlace {
   placeId: string;
@@ -14,6 +15,8 @@ interface CuratedPlace {
   score: number;
   reason: string;
   rank: number;
+  weeklyHours: string[];
+  specialDays: string[];
 }
 
 interface Props {
@@ -79,6 +82,7 @@ function PlaceRow({ place }: { place: CuratedPlace }) {
               {place.reviewCount.toLocaleString()} reviews · {place.rating.toFixed(1)}★
             </p>
             <p className="text-sm text-foreground/80 mt-1.5 leading-snug">{place.reason}</p>
+            <OpeningHours weeklyHours={place.weeklyHours} specialDays={place.specialDays} />
           </div>
         </div>
       </CardContent>

@@ -44,6 +44,8 @@ export async function curateCity(city: CityConfig): Promise<void> {
     getGrowthMap(city.slug),
   ]);
 
+  const rawPlaceMap = new Map(rawPlaces.map((p) => [p.id, p]));
+
   // 2. Build PlaceInput with growth signals
   const places: PlaceInput[] = rawPlaces.map((p) => {
     const growth = growthMap.get(p.id) ?? { reviewCountDelta: 0, ratingDelta: 0 };
@@ -84,6 +86,8 @@ export async function curateCity(city: CityConfig): Promise<void> {
         score: e.score,
         reason: e.reason,
         rank: e.rank,
+        weeklyHours: rawPlaceMap.get(e.placeId)?.weeklyHours ?? [],
+        specialDays: rawPlaceMap.get(e.placeId)?.specialDays ?? [],
       })),
     }),
   ]);
@@ -97,6 +101,8 @@ export async function curateCategoryForCity(city: CityConfig, category: PlaceCat
     getCategoryPlaces(city, category),
     getGrowthMap(city.slug),
   ]);
+
+  const rawPlaceMap = new Map(rawPlaces.map((p) => [p.id, p]));
 
   const places: PlaceInput[] = rawPlaces.map((p) => {
     const growth = growthMap.get(p.id) ?? { reviewCountDelta: 0, ratingDelta: 0 };
@@ -132,6 +138,8 @@ export async function curateCategoryForCity(city: CityConfig, category: PlaceCat
         score: e.score,
         reason: e.reason,
         rank: e.rank,
+        weeklyHours: rawPlaceMap.get(e.placeId)?.weeklyHours ?? [],
+        specialDays: rawPlaceMap.get(e.placeId)?.specialDays ?? [],
       })),
     }),
   ]);
