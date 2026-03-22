@@ -52,7 +52,7 @@ async function analyzeBatch(places: PlaceInput[]): Promise<AnalysisResult[]> {
         },
       },
     ],
-    tool_choice: { type: "auto" },
+    tool_choice: { type: "tool", name: "submit_analysis" },
     messages: [
       {
         role: "user",

@@ -48,7 +48,7 @@ export async function selectPlaces(scored: ScoredPlace[], cityName: string, fina
         },
       },
     ],
-    tool_choice: { type: "auto" },
+    tool_choice: { type: "tool", name: "submit_curated_list" },
     messages: [
       {
         role: "user",
