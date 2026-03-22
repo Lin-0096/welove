@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { snapshotAllTrackedCities } from "@/lib/snapshot";
-import { curateAllTrackedCities } from "@/lib/agents/curate";
+import { snapshotAllTrackedCities, snapshotCity } from "@/lib/snapshot";
+import { curateAllTrackedCities, curateCity } from "@/lib/agents/curate";
+import { getCity } from "@/lib/cities";
 
 export async function GET(request: NextRequest) {
   // Verify Vercel cron secret to prevent unauthorized calls
@@ -9,12 +10,21 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const citySlug = request.nextUrl.searchParams.get("city");
+
   try {
+    if (citySlug) {
+      const city = getCity(citySlug);
+      if (!city) {
+        return NextResponse.json({ error: `Unknown city: ${citySlug}` }, { status: 400 });
+      }
+      await snapshotCity(city);
+      await curateCity(city);
+      return NextResponse.json({ ok: true, city: citySlug });
+    }
+
     const snapshotResults = await snapshotAllTrackedCities();
-
-    // After snapshotting, run AI curation (results stored in DB)
     const curateResults = await curateAllTrackedCities();
-
     return NextResponse.json({ ok: true, snapshotResults, curateResults });
   } catch (err) {
     console.error("[/api/cron/snapshot]", err);
