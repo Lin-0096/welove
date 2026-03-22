@@ -1,9 +1,16 @@
 {
   "crons": [
-    {
-      "path": "/api/cron/snapshot",
-      "schedule": "0 2 * * *"
-    }
+    { "path": "/api/cron/snapshot?city=helsinki&step=snapshot",            "schedule": "0 2 * * *" },
+    { "path": "/api/cron/snapshot?city=helsinki&step=curate&category=cafe",       "schedule": "5 2 * * *" },
+    { "path": "/api/cron/snapshot?city=helsinki&step=curate&category=bar",        "schedule": "10 2 * * *" },
+    { "path": "/api/cron/snapshot?city=helsinki&step=curate&category=restaurant", "schedule": "15 2 * * *" },
+    { "path": "/api/cron/snapshot?city=helsinki&step=curate",              "schedule": "20 2 * * *" },
+
+    { "path": "/api/cron/snapshot?city=oulu&step=snapshot",                "schedule": "30 2 * * *" },
+    { "path": "/api/cron/snapshot?city=oulu&step=curate&category=cafe",          "schedule": "35 2 * * *" },
+    { "path": "/api/cron/snapshot?city=oulu&step=curate&category=bar",           "schedule": "40 2 * * *" },
+    { "path": "/api/cron/snapshot?city=oulu&step=curate&category=restaurant",    "schedule": "45 2 * * *" },
+    { "path": "/api/cron/snapshot?city=oulu&step=curate",                  "schedule": "50 2 * * *" }
   ],
   "functions": {
     "app/api/cron/snapshot/route.ts": {
