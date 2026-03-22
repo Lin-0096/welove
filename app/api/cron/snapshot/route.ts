@@ -27,7 +27,8 @@ export async function GET(request: NextRequest) {
     const curateResults = await curateAllTrackedCities();
     return NextResponse.json({ ok: true, snapshotResults, curateResults });
   } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
     console.error("[/api/cron/snapshot]", err);
-    return NextResponse.json({ error: "Snapshot failed" }, { status: 500 });
+    return NextResponse.json({ error: "Snapshot failed", detail: message }, { status: 500 });
   }
 }
