@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { snapshotAllTrackedCities, snapshotCity } from "@/lib/snapshot";
-import { curateAllTrackedCities, curateCity } from "@/lib/agents/curate";
+import { curateAllTrackedCities, curateCity, curateCategoryForCity } from "@/lib/agents/curate";
+import { PlaceCategory } from "@/lib/google-places";
 import { getCity } from "@/lib/cities";
 
 export async function GET(request: NextRequest) {
@@ -24,8 +25,13 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ ok: true, city: citySlug, step: "snapshot" });
       }
       if (step === "curate") {
-        await curateCity(city);
-        return NextResponse.json({ ok: true, city: citySlug, step: "curate" });
+        const category = request.nextUrl.searchParams.get("category") as PlaceCategory | null;
+        if (category) {
+          await curateCategoryForCity(city, category);
+        } else {
+          await curateCity(city);
+        }
+        return NextResponse.json({ ok: true, city: citySlug, step: "curate", category: category ?? "all" });
       }
       // no step param: run both (may timeout on Hobby for heavy cities)
       await snapshotCity(city);
