@@ -82,8 +82,7 @@ function deriveTags(place: CuratedPlace): string[] {
   const tags: string[] = [];
   if (typeLabel.trim()) tags.push(typeLabel);
 
-  if (place.reviewCount >= 1000) tags.push("Very Popular");
-  else if (place.reviewCount <= 80) tags.push("Hidden Gem");
+  if (place.reviewCount <= 80) tags.push("Hidden Gem");
   else if (place.reviewCount <= 250) tags.push("Local Favorite");
 
   if (place.score >= 80) tags.push("Must Visit");
