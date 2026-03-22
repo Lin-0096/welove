@@ -12,7 +12,7 @@ interface AnalysisResult {
   redFlag: boolean;
 }
 
-async function analyzeBatch(places: PlaceInput[]): Promise<AnalysisResult[]> {
+async function analyzeBatchOnce(places: PlaceInput[]): Promise<AnalysisResult[]> {
   const placesJson = places.map((p) => ({
     id: p.id,
     name: p.name,
@@ -81,6 +81,17 @@ Use the submit_analysis tool with your assessment for all ${places.length} place
   return input.results;
 }
 
+async function analyzeBatch(places: PlaceInput[], retries = 3): Promise<AnalysisResult[]> {
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      return await analyzeBatchOnce(places);
+    } catch (err) {
+      if (attempt === retries - 1) throw err;
+    }
+  }
+  return [];
+}
+
 export async function analyzePlaces(places: PlaceInput[]): Promise<AnalyzedPlace[]> {
   // Split into batches and run in parallel
   const batches: PlaceInput[][] = [];
@@ -88,7 +99,7 @@ export async function analyzePlaces(places: PlaceInput[]): Promise<AnalyzedPlace
     batches.push(places.slice(i, i + BATCH_SIZE));
   }
 
-  const batchResults = await Promise.all(batches.map(analyzeBatch));
+  const batchResults = await Promise.all(batches.map((b) => analyzeBatch(b)));
   const analysisMap = new Map<string, AnalysisResult>();
   for (const results of batchResults) {
     for (const r of results) {
