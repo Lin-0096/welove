@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlaceList } from "../components/PlaceList";
-import { TrendingList } from "../components/TrendingList";
 import { CuratedList } from "../components/CuratedList";
 import { CitySelector } from "../components/CitySelector";
 import { getCity } from "@/lib/cities";
@@ -25,12 +24,11 @@ export default async function CityPage({ params }: Props) {
         </div>
 
         <Tabs defaultValue="cafe">
-          <TabsList className="w-full grid grid-cols-5 mb-6">
+          <TabsList className="w-full grid grid-cols-4 mb-6">
             <TabsTrigger value="cafe">Coffee</TabsTrigger>
             <TabsTrigger value="bar">Bars</TabsTrigger>
             <TabsTrigger value="restaurant">Restaurants</TabsTrigger>
-            <TabsTrigger value="trending">Trending</TabsTrigger>
-            <TabsTrigger value="curated">AI精选</TabsTrigger>
+            <TabsTrigger value="curated">People Love</TabsTrigger>
           </TabsList>
 
           <TabsContent value="cafe">
@@ -51,18 +49,10 @@ export default async function CityPage({ params }: Props) {
             <PlaceList category="restaurant" citySlug={city.slug} />
           </TabsContent>
 
-          <TabsContent value="trending">
-            <SectionHeader
-              title={`Trending in ${city.name}`}
-              subtitle="Fastest growing in reviews & ratings (30 days)"
-            />
-            <TrendingList citySlug={city.slug} />
-          </TabsContent>
-
           <TabsContent value="curated">
             <SectionHeader
-              title={`AI精选 · ${city.name}`}
-              subtitle="AI picks the best across all types — quality, growth & uniqueness"
+              title={`People Love · ${city.name}`}
+              subtitle="The best spots across all types — quality, vibe & uniqueness"
             />
             <CuratedList citySlug={city.slug} />
           </TabsContent>

@@ -60,7 +60,31 @@ export function CuratedList({ citySlug }: Props) {
   );
 }
 
+function deriveTags(place: CuratedPlace): string[] {
+  const tags: string[] = [];
+
+  const typeMap: Record<string, string> = {
+    cafe: "Café", coffee_shop: "Coffee", bar: "Bar", restaurant: "Restaurant",
+    sauna: "Sauna", bakery: "Bakery", brewery: "Brewery", wine_bar: "Wine Bar",
+    night_club: "Club", food: "Food", meal_takeaway: "Takeaway",
+  };
+  tags.push(typeMap[place.primaryType] ?? place.primaryType.replace(/_/g, " "));
+
+  if (place.rating >= 4.8) tags.push("Top Rated");
+  else if (place.rating >= 4.6) tags.push("Highly Rated");
+
+  if (place.reviewCount >= 1000) tags.push("Very Popular");
+  else if (place.reviewCount <= 80) tags.push("Hidden Gem");
+  else if (place.reviewCount <= 250) tags.push("Local Favorite");
+
+  if (place.score >= 80) tags.push("Must Visit");
+
+  return tags;
+}
+
 function CuratedCard({ place }: { place: CuratedPlace }) {
+  const tags = deriveTags(place);
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-4">
@@ -71,14 +95,17 @@ function CuratedCard({ place }: { place: CuratedPlace }) {
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-2">
               <h3 className="font-semibold text-base leading-tight">{place.name}</h3>
-              <Badge variant="secondary" className="text-xs shrink-0">
-                {place.score}pts
-              </Badge>
+              <span className="text-xs text-muted-foreground shrink-0">
+                {place.rating.toFixed(1)}★ · {place.reviewCount.toLocaleString()}
+              </span>
             </div>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {place.reviewCount.toLocaleString()} reviews · {place.rating.toFixed(1)}★ ·{" "}
-              {place.primaryType.replace(/_/g, " ")}
-            </p>
+            <div className="flex flex-wrap gap-1 mt-1.5">
+              {tags.map((tag) => (
+                <Badge key={tag} variant="secondary" className="text-xs px-1.5 py-0">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
             <p className="text-sm text-foreground/80 mt-1.5 leading-snug">{place.reason}</p>
           </div>
         </div>
