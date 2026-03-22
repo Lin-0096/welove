@@ -61,17 +61,26 @@ export function CuratedList({ citySlug }: Props) {
 }
 
 function deriveTags(place: CuratedPlace): string[] {
-  const tags: string[] = [];
-
   const typeMap: Record<string, string> = {
     cafe: "Café", coffee_shop: "Coffee", bar: "Bar", restaurant: "Restaurant",
     sauna: "Sauna", bakery: "Bakery", brewery: "Brewery", wine_bar: "Wine Bar",
     night_club: "Club", food: "Food", meal_takeaway: "Takeaway",
+    pub: "Pub", irish_pub: "Irish Pub", cocktail_bar: "Cocktail Bar",
+    hamburger_restaurant: "Burgers", pizza_restaurant: "Pizza",
+    vietnamese_restaurant: "Vietnamese", eastern_european_restaurant: "Eastern European",
+    seafood_restaurant: "Seafood", sushi_restaurant: "Sushi", ramen_restaurant: "Ramen",
+    chinese_restaurant: "Chinese", japanese_restaurant: "Japanese", indian_restaurant: "Indian",
+    thai_restaurant: "Thai", mexican_restaurant: "Mexican", italian_restaurant: "Italian",
+    museum: "Museum", church: "Church", castle: "Castle", hotel: "Hotel",
+    food_store: "Food Shop", city_park: "Park", botanical_garden: "Garden",
+    sports_activity_location: "Activity", tourist_attraction: "Attraction",
+    nature_preserve: "Nature", amusement_center: "Amusement", event_venue: "Venue",
   };
-  tags.push(typeMap[place.primaryType] ?? place.primaryType.replace(/_/g, " "));
 
-  if (place.rating >= 4.8) tags.push("Top Rated");
-  else if (place.rating >= 4.6) tags.push("Highly Rated");
+  const typeLabel = typeMap[place.primaryType] ?? place.primaryType.replace(/_/g, " ");
+
+  const tags: string[] = [];
+  if (typeLabel.trim()) tags.push(typeLabel);
 
   if (place.reviewCount >= 1000) tags.push("Very Popular");
   else if (place.reviewCount <= 80) tags.push("Hidden Gem");
