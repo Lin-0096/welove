@@ -18,17 +18,27 @@ export default async function CityPage({ params }: Props) {
   return (
     <main className="min-h-screen bg-background">
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold tracking-tight mb-3">Best Places</h1>
-          <CitySelector currentSlug={city.slug} />
+        <div className="mb-10">
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-2">
+            {city.name}
+          </p>
+          <h1 className="text-4xl font-bold tracking-tight leading-none">Best Places</h1>
+          <p className="text-sm text-muted-foreground mt-2">
+            Top-rated spots, curated daily by AI
+          </p>
+          <div className="mt-5">
+            <CitySelector currentSlug={city.slug} />
+          </div>
         </div>
 
         <Tabs defaultValue="cafe">
-          <TabsList className="w-full grid grid-cols-4 mb-6">
+          <TabsList className="w-full grid grid-cols-4 mb-6 bg-background border border-border shadow-sm">
             <TabsTrigger value="cafe">Cafés</TabsTrigger>
             <TabsTrigger value="bar">Bars</TabsTrigger>
             <TabsTrigger value="restaurant">Restaurants</TabsTrigger>
-            <TabsTrigger value="curated">People Love</TabsTrigger>
+            <TabsTrigger value="curated" className="data-[state=active]:text-amber-700">
+              People Love
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="cafe">
@@ -64,9 +74,9 @@ export default async function CityPage({ params }: Props) {
 
 function SectionHeader({ title, subtitle }: { title: string; subtitle: string }) {
   return (
-    <div className="mb-4">
-      <h2 className="text-xl font-semibold">{title}</h2>
-      <p className="text-sm text-muted-foreground">{subtitle}</p>
+    <div className="mb-5 pb-4 border-b border-border">
+      <h2 className="text-lg font-bold tracking-tight">{title}</h2>
+      <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
     </div>
   );
 }

@@ -9,6 +9,13 @@ interface Props {
   citySlug: string;
 }
 
+function rankClass(rank: number): string {
+  if (rank === 1) return "text-amber-500 font-black";
+  if (rank === 2) return "text-zinc-400 font-black";
+  if (rank === 3) return "text-amber-700/70 font-black";
+  return "text-muted-foreground/25 font-bold";
+}
+
 export function TrendingList({ citySlug }: Props) {
   const [entries, setEntries] = useState<GrowthEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +66,7 @@ function TrendingCard({ entry, rank }: { entry: GrowthEntry; rank: number }) {
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-start gap-2 min-w-0">
-            <span className="text-2xl font-bold text-muted-foreground/40 leading-none shrink-0 w-7">
+            <span className={`text-xl leading-none shrink-0 w-7 ${rankClass(rank)}`}>
               {rank}
             </span>
             <div className="min-w-0">

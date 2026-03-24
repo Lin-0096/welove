@@ -14,6 +14,13 @@ function formatType(type: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+function rankClass(rank: number): string {
+  if (rank === 1) return "text-amber-500 font-black";
+  if (rank === 2) return "text-zinc-400 font-black";
+  if (rank === 3) return "text-amber-700/70 font-black";
+  return "text-muted-foreground/25 font-bold";
+}
+
 function StarRating({ rating }: { rating: number }) {
   return (
     <span className="flex items-center gap-1">
@@ -30,7 +37,7 @@ export function PlaceCard({ place, rank }: Props) {
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-start gap-2 min-w-0">
             {rank !== undefined && (
-              <span className="text-2xl font-bold text-muted-foreground/40 leading-none shrink-0 w-7">
+              <span className={`text-xl leading-none shrink-0 w-7 ${rankClass(rank)}`}>
                 {rank}
               </span>
             )}

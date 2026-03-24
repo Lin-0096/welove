@@ -17,10 +17,10 @@ export function CitySelector({ currentSlug }: Props) {
           key={city.slug}
           onClick={() => router.push(`/${city.slug}`)}
           className={[
-            "px-3 py-1 rounded-full text-sm font-medium transition-colors",
+            "px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors",
             city.slug === currentSlug
-              ? "bg-foreground text-background"
-              : "bg-muted text-muted-foreground hover:bg-muted/70",
+              ? "bg-foreground text-background shadow-sm"
+              : "bg-card text-muted-foreground border border-border hover:text-foreground hover:border-foreground/30",
           ].join(" ")}
         >
           {city.name}

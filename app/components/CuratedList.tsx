@@ -22,6 +22,13 @@ interface Props {
   citySlug: string;
 }
 
+function rankClass(rank: number): string {
+  if (rank === 1) return "text-amber-500 font-black";
+  if (rank === 2) return "text-zinc-400 font-black";
+  if (rank === 3) return "text-amber-700/70 font-black";
+  return "text-muted-foreground/25 font-bold";
+}
+
 export function CuratedList({ citySlug }: Props) {
   const [places, setPlaces] = useState<CuratedPlace[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,7 +107,7 @@ function CuratedCard({ place }: { place: CuratedPlace }) {
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
-          <span className="text-2xl font-bold text-muted-foreground/40 leading-none shrink-0 w-7">
+          <span className={`text-xl leading-none shrink-0 w-7 ${rankClass(place.rank)}`}>
             {place.rank}
           </span>
           <div className="min-w-0 flex-1">
