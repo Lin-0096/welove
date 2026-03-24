@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { PlaceCategory } from "@/lib/google-places";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { OpeningHours } from "./OpeningHours";
 
@@ -25,10 +24,10 @@ interface Props {
 }
 
 function rankClass(rank: number): string {
-  if (rank === 1) return "text-amber-500 font-black";
-  if (rank === 2) return "text-zinc-400 font-black";
-  if (rank === 3) return "text-amber-700/70 font-black";
-  return "text-muted-foreground/25 font-bold";
+  if (rank === 1) return "text-amber-500 font-bold";
+  if (rank === 2) return "text-zinc-400 font-bold";
+  if (rank === 3) return "text-amber-700/60 font-bold";
+  return "text-muted-foreground/30 font-medium";
 }
 
 export function PlaceList({ category, citySlug }: Props) {
@@ -62,7 +61,7 @@ export function PlaceList({ category, citySlug }: Props) {
   }
 
   return (
-    <div className="grid gap-3">
+    <div className="divide-y divide-border/50">
       {places.map((place) => (
         <PlaceRow key={place.placeId} place={place} />
       ))}
@@ -72,36 +71,35 @@ export function PlaceList({ category, citySlug }: Props) {
 
 function PlaceRow({ place }: { place: CuratedPlace }) {
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="p-4">
-        <div className="flex items-start gap-3">
-          <span className={`text-xl leading-none shrink-0 w-7 ${rankClass(place.rank)}`}>
-            {place.rank}
-          </span>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-start justify-between gap-2">
-              <h3 className="font-semibold text-base leading-tight">{place.name}</h3>
-              <Badge variant="secondary" className="text-xs shrink-0">
-                {place.score.toFixed(0)}pts
-              </Badge>
-            </div>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {place.reviewCount.toLocaleString()} reviews · {place.rating.toFixed(1)}★
-            </p>
-            <p className="text-sm text-foreground/80 mt-1.5 leading-snug">{place.reason}</p>
-            <OpeningHours weeklyHours={place.weeklyHours} specialDays={place.specialDays} />
-          </div>
+    <div className="flex items-start gap-3 px-3 py-3.5 rounded-lg hover:bg-muted/50 transition-colors -mx-3">
+      <span className={`text-base leading-none shrink-0 w-6 mt-0.5 ${rankClass(place.rank)}`}>
+        {place.rank}
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-semibold text-base leading-tight">{place.name}</h3>
+          <Badge
+            variant="outline"
+            className="text-xs shrink-0 font-normal text-muted-foreground border-border/50"
+          >
+            {place.score.toFixed(0)}pts
+          </Badge>
         </div>
-      </CardContent>
-    </Card>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          {place.reviewCount.toLocaleString()} reviews · {place.rating.toFixed(1)}★
+        </p>
+        <p className="text-sm text-foreground/75 mt-1.5 leading-snug">{place.reason}</p>
+        <OpeningHours weeklyHours={place.weeklyHours} specialDays={place.specialDays} />
+      </div>
+    </div>
   );
 }
 
 function LoadingSkeleton() {
   return (
-    <div className="grid gap-3 mt-4">
+    <div className="space-y-1 mt-2">
       {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i} className="h-24 bg-muted animate-pulse rounded-lg" />
+        <div key={i} className="h-20 bg-muted/60 animate-pulse rounded-lg" />
       ))}
     </div>
   );

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Coffee, Wine, Utensils, Heart } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlaceList } from "../components/PlaceList";
 import { CuratedList } from "../components/CuratedList";
@@ -22,7 +23,7 @@ export default async function CityPage({ params }: Props) {
           <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-2">
             {city.name}
           </p>
-          <h1 className="text-4xl font-bold tracking-tight leading-none">Best Places</h1>
+          <h1 className="text-3xl font-semibold tracking-tight leading-none">Best Places</h1>
           <p className="text-sm text-muted-foreground mt-2">
             Top-rated spots, curated daily by AI
           </p>
@@ -32,12 +33,21 @@ export default async function CityPage({ params }: Props) {
         </div>
 
         <Tabs defaultValue="cafe">
-          <TabsList className="w-full grid grid-cols-4 mb-6 bg-background border border-border shadow-sm">
-            <TabsTrigger value="cafe">Cafés</TabsTrigger>
-            <TabsTrigger value="bar">Bars</TabsTrigger>
-            <TabsTrigger value="restaurant">Restaurants</TabsTrigger>
-            <TabsTrigger value="curated" className="data-[state=active]:text-amber-700">
-              People Love
+          <TabsList
+            variant="line"
+            className="w-full mb-6 gap-0 border-b border-border rounded-none"
+          >
+            <TabsTrigger value="cafe" className="flex-1 gap-1.5 rounded-none px-2 pb-2.5">
+              <Coffee className="size-3.5" />Cafés
+            </TabsTrigger>
+            <TabsTrigger value="bar" className="flex-1 gap-1.5 rounded-none px-2 pb-2.5">
+              <Wine className="size-3.5" />Bars
+            </TabsTrigger>
+            <TabsTrigger value="restaurant" className="flex-1 gap-1.5 rounded-none px-2 pb-2.5">
+              <Utensils className="size-3.5" />Restaurants
+            </TabsTrigger>
+            <TabsTrigger value="curated" className="flex-1 gap-1.5 rounded-none px-2 pb-2.5">
+              <Heart className="size-3.5" />People Love
             </TabsTrigger>
           </TabsList>
 
@@ -74,8 +84,8 @@ export default async function CityPage({ params }: Props) {
 
 function SectionHeader({ title, subtitle }: { title: string; subtitle: string }) {
   return (
-    <div className="mb-5 pb-4 border-b border-border">
-      <h2 className="text-lg font-bold tracking-tight">{title}</h2>
+    <div className="mb-4">
+      <h2 className="text-base font-semibold tracking-tight">{title}</h2>
       <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
     </div>
   );

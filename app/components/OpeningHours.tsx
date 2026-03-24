@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ChevronDown, ChevronUp, Clock } from "lucide-react";
 
 interface Props {
   weeklyHours: string[];
@@ -77,16 +78,17 @@ export function OpeningHours({ weeklyHours, specialDays }: Props) {
           <span className="inline-flex rounded-full h-2 w-2 shrink-0 bg-muted-foreground/25" />
         )}
 
+        <Clock className="size-3 shrink-0 text-muted-foreground/50" />
         <span className="text-xs text-muted-foreground leading-none">
           {todayHours ?? "No hours info"}
         </span>
 
         <button
           onClick={() => setShowAll((v) => !v)}
-          className="text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors ml-auto leading-none"
+          className="text-muted-foreground/40 hover:text-muted-foreground transition-colors ml-auto cursor-pointer"
           aria-label={showAll ? "Hide weekly hours" : "Show weekly hours"}
         >
-          {showAll ? "▲" : "▼"}
+          {showAll ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
         </button>
       </div>
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { OpeningHours } from "./OpeningHours";
 
@@ -23,10 +22,35 @@ interface Props {
 }
 
 function rankClass(rank: number): string {
-  if (rank === 1) return "text-amber-500 font-black";
-  if (rank === 2) return "text-zinc-400 font-black";
-  if (rank === 3) return "text-amber-700/70 font-black";
-  return "text-muted-foreground/25 font-bold";
+  if (rank === 1) return "text-amber-500 font-bold";
+  if (rank === 2) return "text-zinc-400 font-bold";
+  if (rank === 3) return "text-amber-700/60 font-bold";
+  return "text-muted-foreground/30 font-medium";
+}
+
+const TYPE_COLORS: Record<string, string> = {
+  cafe: "bg-amber-50 text-amber-700 border-amber-200",
+  coffee_shop: "bg-amber-50 text-amber-700 border-amber-200",
+  bar: "bg-blue-50 text-blue-700 border-blue-200",
+  pub: "bg-blue-50 text-blue-700 border-blue-200",
+  irish_pub: "bg-blue-50 text-blue-700 border-blue-200",
+  cocktail_bar: "bg-indigo-50 text-indigo-700 border-indigo-200",
+  wine_bar: "bg-purple-50 text-purple-700 border-purple-200",
+  brewery: "bg-orange-50 text-orange-700 border-orange-200",
+  restaurant: "bg-rose-50 text-rose-700 border-rose-200",
+  bakery: "bg-yellow-50 text-yellow-700 border-yellow-200",
+  sauna: "bg-red-50 text-red-700 border-red-200",
+};
+
+const TAG_COLORS: Record<string, string> = {
+  "Hidden Gem": "bg-violet-50 text-violet-700 border-violet-200",
+  "Local Favorite": "bg-sky-50 text-sky-700 border-sky-200",
+  "Must Visit": "bg-emerald-50 text-emerald-700 border-emerald-200",
+};
+
+function tagClass(tag: string, primaryType: string): string {
+  if (TAG_COLORS[tag]) return TAG_COLORS[tag];
+  return TYPE_COLORS[primaryType] ?? "bg-muted text-muted-foreground border-border";
 }
 
 export function CuratedList({ citySlug }: Props) {
@@ -62,7 +86,7 @@ export function CuratedList({ citySlug }: Props) {
   }
 
   return (
-    <div className="grid gap-3">
+    <div className="divide-y divide-border/50">
       {places.map((place) => (
         <CuratedCard key={place.placeId} place={place} />
       ))}
@@ -104,40 +128,40 @@ function CuratedCard({ place }: { place: CuratedPlace }) {
   const tags = deriveTags(place);
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="p-4">
-        <div className="flex items-start gap-3">
-          <span className={`text-xl leading-none shrink-0 w-7 ${rankClass(place.rank)}`}>
-            {place.rank}
+    <div className="flex items-start gap-3 px-3 py-3.5 rounded-lg hover:bg-muted/50 transition-colors -mx-3">
+      <span className={`text-base leading-none shrink-0 w-6 mt-0.5 ${rankClass(place.rank)}`}>
+        {place.rank}
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-semibold text-base leading-tight">{place.name}</h3>
+          <span className="text-xs text-muted-foreground shrink-0">
+            {place.rating.toFixed(1)}★ · {place.reviewCount.toLocaleString()}
           </span>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-start justify-between gap-2">
-              <h3 className="font-semibold text-base leading-tight">{place.name}</h3>
-              <span className="text-xs text-muted-foreground shrink-0">
-                {place.rating.toFixed(1)}★ · {place.reviewCount.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex flex-wrap gap-1 mt-1.5">
-              {tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="text-xs px-1.5 py-0">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-            <p className="text-sm text-foreground/80 mt-1.5 leading-snug">{place.reason}</p>
-            <OpeningHours weeklyHours={place.weeklyHours} specialDays={place.specialDays} />
-          </div>
         </div>
-      </CardContent>
-    </Card>
+        <div className="flex flex-wrap gap-1 mt-1.5">
+          {tags.map((tag) => (
+            <Badge
+              key={tag}
+              variant="outline"
+              className={`text-xs px-1.5 py-0 font-normal ${tagClass(tag, place.primaryType)}`}
+            >
+              {tag}
+            </Badge>
+          ))}
+        </div>
+        <p className="text-sm text-foreground/75 mt-1.5 leading-snug">{place.reason}</p>
+        <OpeningHours weeklyHours={place.weeklyHours} specialDays={place.specialDays} />
+      </div>
+    </div>
   );
 }
 
 function LoadingSkeleton() {
   return (
-    <div className="grid gap-3 mt-4">
+    <div className="space-y-1 mt-2">
       {Array.from({ length: 10 }).map((_, i) => (
-        <div key={i} className="h-24 bg-muted animate-pulse rounded-lg" />
+        <div key={i} className="h-20 bg-muted/60 animate-pulse rounded-lg" />
       ))}
     </div>
   );
