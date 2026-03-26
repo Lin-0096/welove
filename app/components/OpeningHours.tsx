@@ -8,11 +8,9 @@ interface Props {
   specialDays: string[];
 }
 
-function getTodayHours(weeklyHours: string[]): string | null {
+function getTodayHours(weeklyHours: string[], todayIdx: number): string | null {
   if (!weeklyHours.length) return null;
-  const dayIndex = new Date().getDay(); // 0=Sun
-  const googleDay = dayIndex === 0 ? 6 : dayIndex - 1; // 0=Mon, 6=Sun
-  const entry = weeklyHours[googleDay];
+  const entry = weeklyHours[todayIdx];
   return entry ? entry.replace(/^[^:]+:\s*/, "") : null;
 }
 
@@ -27,7 +25,7 @@ function parseTime12h(t: string): number | null {
   return h * 60 + mins;
 }
 
-function computeIsOpen(todayHours: string | null): boolean | null {
+function computeIsOpen(todayHours: string | null, now: Date): boolean | null {
   if (!todayHours) return null;
   const lower = todayHours.toLowerCase();
   if (lower === "closed") return false;
@@ -37,14 +35,13 @@ function computeIsOpen(todayHours: string | null): boolean | null {
   const open = parseTime12h(parts[0]);
   const close = parseTime12h(parts[1]);
   if (open === null || close === null) return null;
-  const now = new Date();
   const cur = now.getHours() * 60 + now.getMinutes();
   return close > open ? cur >= open && cur < close : cur >= open || cur < close;
 }
 
-function getUpcomingSpecialDays(specialDays: string[]): string[] {
+function getUpcomingSpecialDays(specialDays: string[], now: Date): string[] {
   if (!specialDays.length) return [];
-  const today = new Date();
+  const today = new Date(now);
   today.setHours(0, 0, 0, 0);
   const in7Days = new Date(today.getTime() + 7 * 86400000);
   return specialDays.filter((d) => {
@@ -58,10 +55,13 @@ export function OpeningHours({ weeklyHours, specialDays }: Props) {
 
   if (!weeklyHours.length) return null;
 
-  const todayHours = getTodayHours(weeklyHours);
-  const isOpen = computeIsOpen(todayHours);
-  const upcomingSpecialDays = getUpcomingSpecialDays(specialDays);
-  const todayGoogleIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+  const now = new Date();
+  const dayIndex = now.getDay(); // 0=Sun
+  const todayGoogleIdx = dayIndex === 0 ? 6 : dayIndex - 1; // 0=Mon, 6=Sun
+
+  const todayHours = getTodayHours(weeklyHours, todayGoogleIdx);
+  const isOpen = computeIsOpen(todayHours, now);
+  const upcomingSpecialDays = getUpcomingSpecialDays(specialDays, now);
 
   return (
     <div className="mt-2">
