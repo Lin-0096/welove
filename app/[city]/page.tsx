@@ -18,12 +18,12 @@ export default async function CityPage({ params }: Props) {
 
   return (
     <main id="main" className="min-h-screen bg-background">
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="mb-10">
+      <div className="max-w-2xl mx-auto px-4 py-5 sm:py-8">
+        <div className="mb-8 sm:mb-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground mb-3">
             {city.name}
           </p>
-          <h1 className="font-display text-5xl font-black uppercase tracking-tight leading-none">
+          <h1 className="font-display text-4xl min-[375px]:text-5xl font-black uppercase tracking-tight leading-none">
             Best Places
           </h1>
           <p className="text-sm text-muted-foreground mt-3">
@@ -39,19 +39,19 @@ export default async function CityPage({ params }: Props) {
             variant="line"
             className="w-full mb-6 gap-0 border-b border-border rounded-none"
           >
-            <TabsTrigger value="cafe" className="flex-1 gap-1.5 rounded-none px-2 pb-2.5">
-              <Coffee className="size-3.5" aria-hidden="true" />Cafés
+            <TabsTrigger value="cafe" className="flex-1 gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[375px]:text-sm">
+              <Coffee className="size-3.5 shrink-0" aria-hidden="true" />Cafés
             </TabsTrigger>
-            <TabsTrigger value="bar" className="flex-1 gap-1.5 rounded-none px-2 pb-2.5">
-              <Wine className="size-3.5" aria-hidden="true" />Bars
+            <TabsTrigger value="bar" className="flex-1 gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[375px]:text-sm">
+              <Wine className="size-3.5 shrink-0" aria-hidden="true" />Bars
             </TabsTrigger>
-            <TabsTrigger value="restaurant" className="flex-1 gap-1.5 rounded-none px-2 pb-2.5 text-[11px] min-[375px]:text-sm">
-              <Utensils className="size-3.5" aria-hidden="true" />Restaurants
+            <TabsTrigger value="restaurant" className="flex-1 gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[375px]:text-sm">
+              <Utensils className="size-3.5 shrink-0" aria-hidden="true" />Restaurants
             </TabsTrigger>
-            <TabsTrigger value="curated" className="flex-1 gap-1.5 rounded-none px-2 pb-2.5 text-[11px] min-[375px]:text-sm">
-              <Heart className="size-3.5" aria-hidden="true" />
-              <span className="max-[374px]:hidden">People Love</span>
-              <span className="min-[375px]:hidden">Loved</span>
+            <TabsTrigger value="curated" className="flex-1 gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[375px]:text-sm">
+              <Heart className="size-3.5 shrink-0" aria-hidden="true" />
+              <span className="max-[359px]:hidden">People Love</span>
+              <span className="min-[360px]:hidden">Loved</span>
             </TabsTrigger>
           </TabsList>
 
