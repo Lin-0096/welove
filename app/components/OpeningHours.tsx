@@ -85,7 +85,7 @@ export function OpeningHours({ weeklyHours, specialDays }: Props) {
 
         <button
           onClick={() => setShowAll((v) => !v)}
-          className="text-muted-foreground/40 hover:text-muted-foreground transition-colors ml-auto cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-end -mr-2"
+          className="text-muted-foreground/65 hover:text-muted-foreground transition-colors ml-auto cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-end -mr-2"
           aria-label={showAll ? "Hide weekly hours" : "Show weekly hours"}
         >
           {showAll ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}

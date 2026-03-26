@@ -57,9 +57,7 @@ function PlaceRow({ place }: { place: CuratedPlace }) {
         {place.rank}
       </span>
       <div className="min-w-0 flex-1">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-display font-bold text-lg leading-tight">{place.name}</h3>
-        </div>
+        <h3 className="font-display font-bold text-lg leading-tight">{place.name}</h3>
         <p className="text-xs text-muted-foreground mt-0.5 tabular-nums">
           {place.reviewCount.toLocaleString()} reviews ·{" "}
           <span aria-label={`Rated ${place.rating.toFixed(1)} out of 5`}>

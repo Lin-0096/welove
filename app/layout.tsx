@@ -19,8 +19,8 @@ const playfairDisplay = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "welove — The best of Helsinki & Oulu",
-  description: "The best cafés, bars & restaurants in Helsinki and Oulu — curated daily for locals and visitors",
+  title: "welove — The best of Finnish cities",
+  description: "The best cafés, bars & restaurants in Helsinki, Tampere, Turku, Espoo and Oulu — curated daily for locals and visitors",
 };
 
 export default function RootLayout({
