@@ -20,7 +20,7 @@ export default async function CityPage({ params }: Props) {
     <main id="main" className="min-h-screen bg-background">
       <div className="max-w-2xl mx-auto px-4 py-5 sm:py-8">
         <div className="mb-8 sm:mb-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground mb-3">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-brand mb-3">
             {city.name}
           </p>
           <h1 className="font-display text-4xl min-[375px]:text-5xl font-black uppercase tracking-tight leading-none">

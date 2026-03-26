@@ -20,7 +20,7 @@ export function CitySelector({ currentSlug }: Props) {
           className={[
             "px-4 py-2.5 min-h-[44px] rounded-full text-sm font-medium transition-colors shrink-0 whitespace-nowrap",
             city.slug === currentSlug
-              ? "bg-foreground text-background shadow-sm"
+              ? "bg-brand text-brand-foreground shadow-sm"
               : "bg-card text-muted-foreground border border-border hover:text-foreground hover:border-foreground/30",
           ].join(" ")}
         >
