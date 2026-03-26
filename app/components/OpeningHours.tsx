@@ -69,23 +69,23 @@ export function OpeningHours({ weeklyHours, specialDays }: Props) {
         {/* Status dot */}
         {isOpen === true ? (
           <span className="relative flex h-2 w-2 shrink-0">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+            <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-status-open-ping opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-status-open" />
           </span>
         ) : isOpen === false ? (
-          <span className="inline-flex rounded-full h-2 w-2 shrink-0 bg-red-400" />
+          <span className="inline-flex rounded-full h-2 w-2 shrink-0 bg-status-closed" />
         ) : (
           <span className="inline-flex rounded-full h-2 w-2 shrink-0 bg-muted-foreground/25" />
         )}
 
-        <Clock className="size-3 shrink-0 text-muted-foreground/50" />
+        <Clock className="size-3 shrink-0 text-muted-foreground/50" aria-hidden="true" />
         <span className="text-xs text-muted-foreground leading-none">
           {todayHours ?? "No hours info"}
         </span>
 
         <button
           onClick={() => setShowAll((v) => !v)}
-          className="text-muted-foreground/40 hover:text-muted-foreground transition-colors ml-auto cursor-pointer"
+          className="text-muted-foreground/40 hover:text-muted-foreground transition-colors ml-auto cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-end -mr-2"
           aria-label={showAll ? "Hide weekly hours" : "Show weekly hours"}
         >
           {showAll ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
@@ -93,7 +93,7 @@ export function OpeningHours({ weeklyHours, specialDays }: Props) {
       </div>
 
       {upcomingSpecialDays.length > 0 && (
-        <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           Special hours upcoming ({upcomingSpecialDays.map((d) => d.slice(5).replace("-", "/")).join(", ")})
         </p>
       )}

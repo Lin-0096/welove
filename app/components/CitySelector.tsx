@@ -11,13 +11,14 @@ export function CitySelector({ currentSlug }: Props) {
   const router = useRouter();
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
+    <nav aria-label="Select city" className="flex items-center gap-2 flex-wrap">
       {Object.values(CITIES).map((city) => (
         <button
           key={city.slug}
           onClick={() => router.push(`/${city.slug}`)}
+          aria-current={city.slug === currentSlug ? "page" : undefined}
           className={[
-            "px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors",
+            "px-4 py-2.5 min-h-[44px] rounded-full text-sm font-medium transition-colors",
             city.slug === currentSlug
               ? "bg-foreground text-background shadow-sm"
               : "bg-card text-muted-foreground border border-border hover:text-foreground hover:border-foreground/30",
@@ -26,6 +27,6 @@ export function CitySelector({ currentSlug }: Props) {
           {city.name}
         </button>
       ))}
-    </div>
+    </nav>
   );
 }

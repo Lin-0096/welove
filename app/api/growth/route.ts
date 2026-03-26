@@ -2,15 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCity } from "@/lib/cities";
 import { PlaceSnapshot } from "@/lib/generated/prisma/client";
-
-export interface GrowthEntry {
-  placeId: string;
-  name: string;
-  currentRating: number;
-  currentReviewCount: number;
-  reviewCountDelta: number;
-  ratingDelta: number;
-}
+import { GrowthEntry } from "@/lib/types";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;

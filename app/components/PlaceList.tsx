@@ -2,32 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { PlaceCategory } from "@/lib/google-places";
-import { Badge } from "@/components/ui/badge";
+import { CuratedPlace } from "@/lib/types";
+import { rankClass } from "@/lib/rank";
 import { OpeningHours } from "./OpeningHours";
-
-interface CuratedPlace {
-  placeId: string;
-  name: string;
-  rating: number;
-  reviewCount: number;
-  primaryType: string;
-  score: number;
-  reason: string;
-  rank: number;
-  weeklyHours: string[];
-  specialDays: string[];
-}
 
 interface Props {
   category: PlaceCategory;
   citySlug: string;
-}
-
-function rankClass(rank: number): string {
-  if (rank === 1) return "text-amber-500 font-bold";
-  if (rank === 2) return "text-zinc-400 font-bold";
-  if (rank === 3) return "text-amber-700/60 font-bold";
-  return "text-muted-foreground/30 font-medium";
 }
 
 export function PlaceList({ category, citySlug }: Props) {
@@ -53,9 +34,9 @@ export function PlaceList({ category, citySlug }: Props) {
 
   if (places.length === 0) {
     return (
-      <div className="text-center py-16 text-muted-foreground">
+      <div className="py-16 text-muted-foreground">
         <p className="text-lg font-medium">No curated list yet</p>
-        <p className="text-sm mt-2">The AI curation runs daily. Check back tomorrow.</p>
+        <p className="text-sm mt-2">Our picks are updated daily. Check back tomorrow.</p>
       </div>
     );
   }
@@ -72,23 +53,20 @@ export function PlaceList({ category, citySlug }: Props) {
 function PlaceRow({ place }: { place: CuratedPlace }) {
   return (
     <div className="flex items-start gap-3 px-3 py-3.5 rounded-lg hover:bg-muted/50 transition-colors -mx-3">
-      <span className={`text-base leading-none shrink-0 w-6 mt-0.5 ${rankClass(place.rank)}`}>
+      <span className={`font-display font-black text-xl leading-none shrink-0 w-7 mt-0.5 tabular-nums ${rankClass(place.rank)}`}>
         {place.rank}
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-base leading-tight">{place.name}</h3>
-          <Badge
-            variant="outline"
-            className="text-xs shrink-0 font-normal text-muted-foreground border-border/50"
-          >
-            {place.score.toFixed(0)}pts
-          </Badge>
+          <h3 className="font-display font-bold text-lg leading-tight">{place.name}</h3>
         </div>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          {place.reviewCount.toLocaleString()} reviews · {place.rating.toFixed(1)}★
+        <p className="text-xs text-muted-foreground mt-0.5 tabular-nums">
+          {place.reviewCount.toLocaleString()} reviews ·{" "}
+          <span aria-label={`Rated ${place.rating.toFixed(1)} out of 5`}>
+            {place.rating.toFixed(1)}★
+          </span>
         </p>
-        <p className="text-sm text-foreground/75 mt-1.5 leading-snug">{place.reason}</p>
+        <p className="text-base text-foreground/75 mt-1.5 leading-snug">{place.reason}</p>
         <OpeningHours weeklyHours={place.weeklyHours} specialDays={place.specialDays} />
       </div>
     </div>
@@ -97,17 +75,18 @@ function PlaceRow({ place }: { place: CuratedPlace }) {
 
 function LoadingSkeleton() {
   return (
-    <div className="space-y-1 mt-2">
+    <div role="status" aria-label="Loading places" className="space-y-1 mt-2">
       {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i} className="h-20 bg-muted/60 animate-pulse rounded-lg" />
+        <div key={i} className="h-20 bg-muted/60 motion-safe:animate-pulse rounded-lg" aria-hidden="true" />
       ))}
+      <span className="sr-only">Loading…</span>
     </div>
   );
 }
 
 function ErrorState({ message }: { message: string }) {
   return (
-    <div className="text-center py-12 text-destructive">
+    <div className="py-12 text-destructive">
       <p className="font-medium">Failed to load places</p>
       <p className="text-sm mt-1 text-muted-foreground">{message}</p>
     </div>
