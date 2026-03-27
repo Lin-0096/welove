@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { ScoredPlace, CuratedEntry } from "./types";
 
 const client = new Anthropic();
-const CANDIDATE_MULTIPLIER = 2;
+const CANDIDATE_MULTIPLIER = 3;
 
 export async function selectPlaces(scored: ScoredPlace[], cityName: string, finalCount = 20): Promise<CuratedEntry[]> {
   const candidateCount = finalCount * CANDIDATE_MULTIPLIER;

@@ -207,15 +207,56 @@ export function applyDiscoverAlgorithm(pool: Place[]): Place[] {
   return result;
 }
 
+const CATEGORY_TARGET = 100;
+const CATEGORY_MAX_PAGES = 5; // 5 × 20 = 100
+
 export async function getCategoryPlaces(
   city: CityConfig,
   category: PlaceCategory
 ): Promise<Place[]> {
-  const places = await fetchText(city, CATEGORY_QUERY[category]);
-  return places
+  const collected: Place[] = [];
+  let pageToken: string | undefined;
+
+  for (let page = 0; page < CATEGORY_MAX_PAGES; page++) {
+    const body: Record<string, unknown> = {
+      textQuery: `${CATEGORY_QUERY[category]} in ${city.name} Finland`,
+      rankPreference: "RELEVANCE",
+      maxResultCount: 20,
+      locationBias: {
+        circle: { center: city.center, radius: city.radius },
+      },
+    };
+    if (pageToken) body.pageToken = pageToken;
+
+    const res = await fetch(`${BASE_URL}/places:searchText`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": API_KEY,
+        "X-Goog-FieldMask": FIELD_MASK,
+      },
+      body: JSON.stringify(body),
+      // Only cache the first page; page tokens are ephemeral
+      next: page === 0 ? { revalidate: 3600 } : { revalidate: 0 },
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`Google Places API error (page ${page + 1}): ${res.status} ${err}`);
+    }
+
+    const data = await res.json();
+    const batch = (data.places ?? []) as Record<string, unknown>[];
+    collected.push(...batch.map(mapPlace));
+
+    pageToken = data.nextPageToken as string | undefined;
+    if (!pageToken || batch.length === 0) break;
+  }
+
+  return dedupe(collected)
     .filter((p) => p.rating > 0)
-    .sort((a, b) => b.rating - a.rating)
-    .slice(0, 10);
+    .sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount)
+    .slice(0, CATEGORY_TARGET);
 }
 
 export async function getDiscoverPlaces(city: CityConfig): Promise<Place[]> {
