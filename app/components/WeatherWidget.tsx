@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { CityConfig } from "@/lib/cities";
-import { WMO_LABELS, type Locale } from "@/lib/i18n";
+import { WMO_LABELS, getT, type Locale } from "@/lib/i18n";
 
 interface WeatherData {
   temperature: number;
@@ -40,7 +40,7 @@ export function WeatherWidget({ city, locale }: Props) {
   if (!weather) {
     return (
       <span className="block min-h-[1.25rem]" role="status">
-        <span className="sr-only">Loading weather…</span>
+        <span className="sr-only">{getT(locale).loadingWeather}</span>
       </span>
     );
   }

@@ -38,74 +38,74 @@ export default async function CityPage({ params }: Props) {
         {t.skipToContent}
       </a>
       <main id="main" className="min-h-screen bg-background">
-      <div className="max-w-2xl mx-auto px-4 py-5 sm:py-8">
-        <div className="mb-8 sm:mb-10">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-brand">
-              {city.name}
+        <div className="max-w-2xl mx-auto px-4 py-5 sm:py-8">
+          <div className="mb-8 sm:mb-10">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-brand">
+                {city.name}
+              </p>
+              <LanguageSwitcher currentLocale={locale} />
+            </div>
+            <h1 className="font-display text-4xl min-[375px]:text-5xl font-black uppercase tracking-tight leading-none">
+              {t.bestPlaces}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-3">
+              {t.subtitle(city.name)}
             </p>
-            <LanguageSwitcher currentLocale={locale} />
+            <div className="mt-5">
+              <CitySelector currentSlug={city.slug} locale={locale} />
+            </div>
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+              <WeatherWidget city={city} locale={locale} />
+              <LayoverTimer backByLabel={t.backBy} tomorrowLabel={t.tomorrow} />
+            </div>
           </div>
-          <h1 className="font-display text-4xl min-[375px]:text-5xl font-black uppercase tracking-tight leading-none">
-            {t.bestPlaces}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-3">
-            {t.subtitle(city.name)}
-          </p>
-          <div className="mt-5">
-            <CitySelector currentSlug={city.slug} locale={locale} />
-          </div>
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-            <WeatherWidget city={city} locale={locale} />
-            <LayoverTimer backByLabel={t.backBy} tomorrowLabel={t.tomorrow} />
-          </div>
+
+          <Tabs defaultValue="cafe">
+            <TabsList
+              variant="line"
+              className="w-full mb-6 gap-0 border-b border-border rounded-none"
+            >
+              <TabsTrigger value="cafe" className="flex-1 min-[480px]:gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[480px]:text-sm">
+                <Coffee className="size-3.5 shrink-0" aria-hidden="true" />
+                <span className="max-[479px]:sr-only">{t.tabs.cafe}</span>
+              </TabsTrigger>
+              <TabsTrigger value="bar" className="flex-1 min-[480px]:gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[480px]:text-sm">
+                <Wine className="size-3.5 shrink-0" aria-hidden="true" />
+                <span className="max-[479px]:sr-only">{t.tabs.bar}</span>
+              </TabsTrigger>
+              <TabsTrigger value="restaurant" className="flex-1 min-[480px]:gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[480px]:text-sm">
+                <Utensils className="size-3.5 shrink-0" aria-hidden="true" />
+                <span className="max-[479px]:sr-only">{t.tabs.restaurant}</span>
+              </TabsTrigger>
+              <TabsTrigger value="curated" className="flex-1 min-[480px]:gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[480px]:text-sm">
+                <Heart className="size-3.5 shrink-0" aria-hidden="true" />
+                <span className="max-[479px]:sr-only">{t.tabs.curated}</span>
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="cafe">
+              <SectionHeader title={t.sections.cafe.title(city.name)} subtitle={t.sections.cafe.sub} />
+              <PlaceList category="cafe" citySlug={city.slug} locale={locale} />
+            </TabsContent>
+
+            <TabsContent value="bar">
+              <SectionHeader title={t.sections.bar.title(city.name)} subtitle={t.sections.bar.sub} />
+              <PlaceList category="bar" citySlug={city.slug} locale={locale} />
+            </TabsContent>
+
+            <TabsContent value="restaurant">
+              <SectionHeader title={t.sections.restaurant.title(city.name)} subtitle={t.sections.restaurant.sub} />
+              <PlaceList category="restaurant" citySlug={city.slug} locale={locale} />
+            </TabsContent>
+
+            <TabsContent value="curated">
+              <SectionHeader title={t.sections.curated.title(city.name)} subtitle={t.sections.curated.sub} />
+              <CuratedList citySlug={city.slug} locale={locale} />
+            </TabsContent>
+          </Tabs>
         </div>
-
-        <Tabs defaultValue="cafe">
-          <TabsList
-            variant="line"
-            className="w-full mb-6 gap-0 border-b border-border rounded-none"
-          >
-            <TabsTrigger value="cafe" className="flex-1 min-[480px]:gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[480px]:text-sm">
-              <Coffee className="size-3.5 shrink-0" aria-hidden="true" />
-              <span className="max-[479px]:sr-only">{t.tabs.cafe}</span>
-            </TabsTrigger>
-            <TabsTrigger value="bar" className="flex-1 min-[480px]:gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[480px]:text-sm">
-              <Wine className="size-3.5 shrink-0" aria-hidden="true" />
-              <span className="max-[479px]:sr-only">{t.tabs.bar}</span>
-            </TabsTrigger>
-            <TabsTrigger value="restaurant" className="flex-1 min-[480px]:gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[480px]:text-sm">
-              <Utensils className="size-3.5 shrink-0" aria-hidden="true" />
-              <span className="max-[479px]:sr-only">{t.tabs.restaurant}</span>
-            </TabsTrigger>
-            <TabsTrigger value="curated" className="flex-1 min-[480px]:gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[480px]:text-sm">
-              <Heart className="size-3.5 shrink-0" aria-hidden="true" />
-              <span className="max-[479px]:sr-only">{t.tabs.curated}</span>
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="cafe">
-            <SectionHeader title={t.sections.cafe.title(city.name)} subtitle={t.sections.cafe.sub} />
-            <PlaceList category="cafe" citySlug={city.slug} locale={locale} />
-          </TabsContent>
-
-          <TabsContent value="bar">
-            <SectionHeader title={t.sections.bar.title(city.name)} subtitle={t.sections.bar.sub} />
-            <PlaceList category="bar" citySlug={city.slug} locale={locale} />
-          </TabsContent>
-
-          <TabsContent value="restaurant">
-            <SectionHeader title={t.sections.restaurant.title(city.name)} subtitle={t.sections.restaurant.sub} />
-            <PlaceList category="restaurant" citySlug={city.slug} locale={locale} />
-          </TabsContent>
-
-          <TabsContent value="curated">
-            <SectionHeader title={t.sections.curated.title(city.name)} subtitle={t.sections.curated.sub} />
-            <CuratedList citySlug={city.slug} locale={locale} />
-          </TabsContent>
-        </Tabs>
-      </div>
-    </main>
+      </main>
     </>
   );
 }

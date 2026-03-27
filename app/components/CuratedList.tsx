@@ -67,7 +67,7 @@ export function CuratedList({ citySlug, locale }: Props) {
     return () => controller.abort();
   }, [citySlug, locale]);
 
-  if (loading) return <LoadingSkeleton />;
+  if (loading) return <LoadingSkeleton label={t.loadingPlaces} />;
   if (error) return <ErrorState message={t.errorCurated} />;
 
   if (places.length === 0) {
@@ -80,7 +80,7 @@ export function CuratedList({ citySlug, locale }: Props) {
   }
 
   return (
-    <ul className="divide-y divide-border/50" aria-label="Curated places">
+    <ul className="divide-y divide-border/50">
       {places.map((place) => (
         <CuratedCard key={place.placeId} place={place} t={t} locale={locale} />
       ))}
@@ -114,7 +114,7 @@ function CuratedCard({ place, t, locale }: { place: CuratedPlace; t: ReturnType<
   return (
     <li className="flex items-start gap-3 px-3 py-3.5 rounded-lg hover:bg-muted/50 transition-colors -mx-3 list-none">
       <span
-        aria-label={`Ranked ${place.rank}`}
+        aria-label={t.rankAriaLabel(place.rank)}
         className={`font-display font-black text-xl leading-none shrink-0 w-7 mt-0.5 tabular-nums ${rankClass(place.rank)}`}
       >
         {place.rank}
@@ -123,7 +123,7 @@ function CuratedCard({ place, t, locale }: { place: CuratedPlace; t: ReturnType<
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-display font-bold text-lg leading-tight">{place.name}</h3>
           <span className="text-xs text-muted-foreground shrink-0 tabular-nums">
-            <span aria-label={`Rated ${place.rating.toFixed(1)} out of 5`}>
+            <span aria-label={t.ratingAriaLabel(place.rating.toFixed(1))}>
               {place.rating.toFixed(1)}★
             </span>
             {" · "}{place.reviewCount.toLocaleString(HTML_LANG[locale])}
@@ -147,13 +147,13 @@ function CuratedCard({ place, t, locale }: { place: CuratedPlace; t: ReturnType<
   );
 }
 
-function LoadingSkeleton() {
+function LoadingSkeleton({ label }: { label: string }) {
   return (
-    <div role="status" aria-label="Loading places" className="space-y-1 mt-2">
+    <div role="status" aria-label={label} className="space-y-1 mt-2">
       {Array.from({ length: 10 }).map((_, i) => (
         <div key={i} className="h-20 bg-muted/60 motion-safe:animate-pulse rounded-lg" aria-hidden="true" />
       ))}
-      <span className="sr-only">Loading…</span>
+      <span className="sr-only">{label}</span>
     </div>
   );
 }

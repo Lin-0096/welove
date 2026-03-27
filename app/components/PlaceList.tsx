@@ -63,7 +63,7 @@ export function PlaceList({ category, citySlug, locale }: Props) {
     return () => controller.abort();
   }, [category, citySlug, locale]);
 
-  if (loading) return <LoadingSkeleton />;
+  if (loading) return <LoadingSkeleton label={t.loadingPlaces} />;
   if (error) return <ErrorState message={t.errorPlace} />;
 
   if (places.length === 0) {
@@ -91,7 +91,7 @@ function PlaceRow({ place, locale }: { place: CuratedPlace; locale: Locale }) {
   return (
     <li className="flex items-start gap-3 px-3 py-3.5 rounded-lg hover:bg-muted/50 transition-colors -mx-3 list-none">
       <span
-        aria-label={`Ranked ${place.rank}`}
+        aria-label={t.rankAriaLabel(place.rank)}
         className={`font-display font-black text-xl leading-none shrink-0 w-7 mt-0.5 tabular-nums ${rankClass(place.rank)}`}
       >
         {place.rank}
@@ -100,7 +100,7 @@ function PlaceRow({ place, locale }: { place: CuratedPlace; locale: Locale }) {
         <h3 className="font-display font-bold text-lg leading-tight">{place.name}</h3>
         <p className="text-xs text-muted-foreground mt-0.5 tabular-nums">
           {place.reviewCount.toLocaleString(bcp47)} {t.reviewsLabel} ·{" "}
-          <span aria-label={`Rated ${place.rating.toFixed(1)} out of 5`}>
+          <span aria-label={t.ratingAriaLabel(place.rating.toFixed(1))}>
             {place.rating.toFixed(1)}★
           </span>
         </p>
@@ -111,13 +111,13 @@ function PlaceRow({ place, locale }: { place: CuratedPlace; locale: Locale }) {
   );
 }
 
-function LoadingSkeleton() {
+function LoadingSkeleton({ label }: { label: string }) {
   return (
-    <div role="status" aria-label="Loading places" className="space-y-1 mt-2">
+    <div role="status" aria-label={label} className="space-y-1 mt-2">
       {Array.from({ length: 5 }).map((_, i) => (
         <div key={i} className="h-20 bg-muted/60 motion-safe:animate-pulse rounded-lg" aria-hidden="true" />
       ))}
-      <span className="sr-only">Loading…</span>
+      <span className="sr-only">{label}</span>
     </div>
   );
 }

@@ -38,6 +38,10 @@ const dict = {
     errorCurated: "Failed to load curated list",
     skipToContent: "Skip to content",
     reviewsLabel: "reviews",
+    rankAriaLabel: (n: number) => `Ranked ${n}`,
+    ratingAriaLabel: (r: string) => `Rated ${r} out of 5`,
+    loadingPlaces: "Loading places",
+    loadingWeather: "Loading weather…",
     tags: { hiddenGem: "Hidden Gem", localFavorite: "Local Favorite", mustVisit: "Must Visit" },
     hours: {
       openNow: "Open now",
@@ -81,6 +85,10 @@ const dict = {
     errorCurated: "Listan lataus epäonnistui",
     skipToContent: "Siirry sisältöön",
     reviewsLabel: "arvostelua",
+    rankAriaLabel: (n: number) => `Sija ${n}`,
+    ratingAriaLabel: (r: string) => `Arvosana ${r} / 5`,
+    loadingPlaces: "Ladataan paikkoja",
+    loadingWeather: "Haetaan säätietoja…",
     tags: { hiddenGem: "Piilokohde", localFavorite: "Paikallinen suosikki", mustVisit: "Ehdoton käynti" },
     hours: {
       openNow: "Auki nyt",
@@ -124,6 +132,10 @@ const dict = {
     errorCurated: "无法加载推荐列表",
     skipToContent: "跳至内容",
     reviewsLabel: "条评价",
+    rankAriaLabel: (n: number) => `排名第${n}`,
+    ratingAriaLabel: (r: string) => `评分${r}/5`,
+    loadingPlaces: "加载地点中",
+    loadingWeather: "正在加载天气…",
     tags: { hiddenGem: "小众宝藏", localFavorite: "本地最爱", mustVisit: "必去之地" },
     hours: {
       openNow: "营业中",
