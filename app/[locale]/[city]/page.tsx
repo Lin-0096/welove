@@ -7,8 +7,14 @@ import { CitySelector } from "../../components/CitySelector";
 import { WeatherWidget } from "../../components/WeatherWidget";
 import { LayoverTimer } from "../../components/LayoverTimer";
 import { LanguageSwitcher } from "../../components/LanguageSwitcher";
-import { getCity } from "@/lib/cities";
-import { getT, isValidLocale, type Locale } from "@/lib/i18n";
+import { getCity, CITY_SLUGS } from "@/lib/cities";
+import { getT, isValidLocale, LOCALES, type Locale } from "@/lib/i18n";
+
+export async function generateStaticParams() {
+  return LOCALES.flatMap((locale) =>
+    CITY_SLUGS.map((city) => ({ locale, city }))
+  );
+}
 
 interface Props {
   params: Promise<{ locale: string; city: string }>;

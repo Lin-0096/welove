@@ -34,12 +34,6 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-3 focus:py-1.5 focus:bg-foreground focus:text-background focus:text-sm focus:font-medium focus:rounded-md focus:outline-none"
-        >
-          Skip to content
-        </a>
         {children}
       </body>
     </html>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { PlaceCategory } from "@/lib/google-places";
 import { CuratedPlace } from "@/lib/types";
 import { rankClass } from "@/lib/rank";
@@ -13,24 +13,55 @@ interface Props {
   locale: Locale;
 }
 
+// Module-level cache: persists across tab switches in the same session.
+// Key: "category:city:locale", TTL: 5 minutes.
+const cache = new Map<string, { places: CuratedPlace[]; ts: number }>();
+const CACHE_TTL = 5 * 60 * 1000;
+
 export function PlaceList({ category, citySlug, locale }: Props) {
   const t = getT(locale);
-  const [places, setPlaces] = useState<CuratedPlace[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cacheKey = `${category}:${citySlug}:${locale}`;
+  const cached = cache.get(cacheKey);
+  const hasValidCache = cached && Date.now() - cached.ts < CACHE_TTL;
+
+  const [places, setPlaces] = useState<CuratedPlace[]>(hasValidCache ? cached.places : []);
+  const [loading, setLoading] = useState(!hasValidCache);
   const [error, setError] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    const key = `${category}:${citySlug}:${locale}`;
+    const hit = cache.get(key);
+    if (hit && Date.now() - hit.ts < CACHE_TTL) {
+      setPlaces(hit.places);
+      setLoading(false);
+      return;
+    }
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setLoading(true);
     setError(null);
-    fetch(`/api/places?category=${category}&city=${citySlug}&locale=${locale}`)
+    fetch(`/api/places?category=${category}&city=${citySlug}&locale=${locale}`, {
+      signal: controller.signal,
+    })
       .then((r) => r.json())
       .then((data) => {
         if (data.error) throw new Error(data.error);
+        cache.set(key, { places: data.places, ts: Date.now() });
         setPlaces(data.places);
       })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
-  }, [category, citySlug]);
+      .catch((e) => {
+        if (e.name !== "AbortError") setError(e.message);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [category, citySlug, locale]);
 
   if (loading) return <LoadingSkeleton />;
   if (error) return <ErrorState message={t.errorPlace} />;

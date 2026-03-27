@@ -1,11 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 import { CuratedPlace } from "@/lib/types";
 import { rankClass } from "@/lib/rank";
 import { OpeningHours } from "./OpeningHours";
-import { getT, type Locale } from "@/lib/i18n";
+import { getT, HTML_LANG, type Locale } from "@/lib/i18n";
+
+// Module-level cache: persists across tab switches in the same session.
+// Key: "city:locale", TTL: 5 minutes.
+const cache = new Map<string, { places: CuratedPlace[]; ts: number }>();
+const CACHE_TTL = 5 * 60 * 1000;
 
 interface Props {
   citySlug: string;
@@ -21,22 +26,46 @@ function tagClass(highlighted: boolean): string {
 
 export function CuratedList({ citySlug, locale }: Props) {
   const t = getT(locale);
-  const [places, setPlaces] = useState<CuratedPlace[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cacheKey = `${citySlug}:${locale}`;
+  const cached = cache.get(cacheKey);
+  const hasValidCache = cached && Date.now() - cached.ts < CACHE_TTL;
+
+  const [places, setPlaces] = useState<CuratedPlace[]>(hasValidCache ? cached.places : []);
+  const [loading, setLoading] = useState(!hasValidCache);
   const [error, setError] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    const key = `${citySlug}:${locale}`;
+    const hit = cache.get(key);
+    if (hit && Date.now() - hit.ts < CACHE_TTL) {
+      setPlaces(hit.places);
+      setLoading(false);
+      return;
+    }
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setLoading(true);
     setError(null);
-    fetch(`/api/curated?city=${citySlug}&locale=${locale}`)
+    fetch(`/api/curated?city=${citySlug}&locale=${locale}`, { signal: controller.signal })
       .then((r) => r.json())
       .then((data) => {
         if (data.error) throw new Error(data.error);
+        cache.set(key, { places: data.places, ts: Date.now() });
         setPlaces(data.places);
       })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
-  }, [citySlug]);
+      .catch((e) => {
+        if (e.name !== "AbortError") setError(e.message);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [citySlug, locale]);
 
   if (loading) return <LoadingSkeleton />;
   if (error) return <ErrorState message={t.errorCurated} />;
@@ -97,7 +126,7 @@ function CuratedCard({ place, t, locale }: { place: CuratedPlace; t: ReturnType<
             <span aria-label={`Rated ${place.rating.toFixed(1)} out of 5`}>
               {place.rating.toFixed(1)}★
             </span>
-            {" · "}{place.reviewCount.toLocaleString()}
+            {" · "}{place.reviewCount.toLocaleString(HTML_LANG[locale])}
           </span>
         </div>
         <div className="flex flex-wrap gap-1 mt-1.5">
@@ -132,8 +161,7 @@ function LoadingSkeleton() {
 function ErrorState({ message }: { message: string }) {
   return (
     <div className="py-12 text-destructive">
-      <p className="font-medium">Failed to load curated list</p>
-      <p className="text-sm mt-1 text-muted-foreground">{message}</p>
+      <p className="font-medium">{message}</p>
     </div>
   );
 }
