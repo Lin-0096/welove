@@ -1,8 +1,11 @@
 import { AnalyzedPlace, ScoredPlace } from "./types";
 
-// Normalize to 0-1 with log scale for review count
-function reviewCountScore(n: number): number {
-  return Math.min(Math.log10(n + 1) / Math.log10(5000), 1);
+const BAYESIAN_M = 100; // minimum review threshold
+
+// Bayesian average: pulls low-review places toward the global mean
+function bayesianRating(rating: number, reviewCount: number, globalMean: number): number {
+  return (reviewCount / (reviewCount + BAYESIAN_M)) * rating +
+         (BAYESIAN_M / (reviewCount + BAYESIAN_M)) * globalMean;
 }
 
 // Normalize review count growth to 0-1 (50+ new reviews = max)
@@ -11,17 +14,24 @@ function growthScore(delta: number): number {
 }
 
 export function scorePlaces(places: AnalyzedPlace[]): ScoredPlace[] {
-  return places
-    .filter((p) => !p.redFlag && p.rating >= 3.5)
+  const filtered = places.filter((p) => !p.redFlag && p.rating >= 3.5);
+
+  // Global mean rating across the filtered set
+  const globalMean = filtered.length > 0
+    ? filtered.reduce((sum, p) => sum + p.rating, 0) / filtered.length
+    : 4.0;
+
+  return filtered
     .map((p) => {
-      // Quality: 40 pts — rating × review volume
-      const quality = (p.rating / 5) * reviewCountScore(p.reviewCount) * 40;
+      // Quality: 60 pts — Bayesian-adjusted rating
+      const bRating = bayesianRating(p.rating, p.reviewCount, globalMean);
+      const quality = (bRating / 5) * 60;
 
-      // Growth: 20 pts — recent momentum
-      const growth = growthScore(p.reviewCountDelta) * 20;
+      // Growth: 15 pts — recent momentum
+      const growth = growthScore(p.reviewCountDelta) * 15;
 
-      // Semantic: 40 pts — AI uniqueness + appeal
-      const semantic = ((p.uniqueness + p.appeal) / 20) * 40;
+      // Semantic: 25 pts — AI uniqueness + appeal
+      const semantic = ((p.uniqueness + p.appeal) / 20) * 25;
 
       const score = Math.round(quality + growth + semantic);
 
