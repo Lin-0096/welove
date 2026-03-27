@@ -62,10 +62,10 @@ Places:
 ${JSON.stringify(placesJson, null, 2)}
 
 For each place evaluate:
-- uniqueness (1-10): Is this a distinctive local spot or a generic chain/tourist trap?
-- appeal (1-10): Would a discerning local recommend this to a friend?
-- tags: 2-4 short descriptive labels (e.g. "hidden gem", "local favorite", "tourist trap", "chain store", "historic", "trendy", "cozy")
-- redFlag: true if it's a well-known chain, obvious tourist trap, or low quality
+- uniqueness (1-10): How memorable and worth-visiting is this place vs a generic chain?
+- appeal (1-10): Based on ratings and review volume, how much do people genuinely love this place?
+- tags: 2-4 short descriptive labels (e.g. "highly rated", "popular", "chain store", "historic", "cozy", "great food")
+- redFlag: true only if it's a well-known global chain (McDonald's, Starbucks) or clearly low quality
 
 Use the submit_analysis tool with your assessment for all ${places.length} places.`,
       },

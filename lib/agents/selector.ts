@@ -60,12 +60,9 @@ Candidates (pre-scored, higher score = better):
 ${JSON.stringify(candidates, null, 2)}
 
 Rules:
-1. Prioritize high scores, but ensure diversity:
-   - At most 4 places of the same primaryType
-   - Include at least 5 different types if possible (unless all candidates are the same type)
-2. Prefer places with authentic local character over tourist-oriented spots
-3. If a high-scoring place is a duplicate of a better-known place, skip it
-4. Write a compelling one-sentence reason for each selection
+1. Follow the scores — higher score means more people love it, rank accordingly
+2. Ensure no duplicates — if two entries are clearly the same place, keep the higher-scored one
+3. Write a compelling one-sentence reason for each selection based on its ratings and what makes it worth visiting
 
 Submit exactly ${finalCount} places using submit_curated_list, ranked best first.`,
       },
