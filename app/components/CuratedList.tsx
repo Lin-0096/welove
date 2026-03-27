@@ -5,9 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { CuratedPlace } from "@/lib/types";
 import { rankClass } from "@/lib/rank";
 import { OpeningHours } from "./OpeningHours";
+import { getT, type Locale } from "@/lib/i18n";
 
 interface Props {
   citySlug: string;
+  locale: Locale;
 }
 
 const HIGHLIGHTED_TAGS = new Set(["Must Visit"]);
@@ -19,7 +21,8 @@ function tagClass(tag: string): string {
   return "text-muted-foreground border-border/60";
 }
 
-export function CuratedList({ citySlug }: Props) {
+export function CuratedList({ citySlug, locale }: Props) {
+  const t = getT(locale);
   const [places, setPlaces] = useState<CuratedPlace[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,15 +41,13 @@ export function CuratedList({ citySlug }: Props) {
   }, [citySlug]);
 
   if (loading) return <LoadingSkeleton />;
-  if (error) return <ErrorState message={error} />;
+  if (error) return <ErrorState message={t.errorCurated} />;
 
   if (places.length === 0) {
     return (
       <div className="py-16 text-muted-foreground">
-        <p className="text-lg font-medium">No curated list yet</p>
-        <p className="text-sm mt-2">
-          Our picks are updated daily. Check back tomorrow.
-        </p>
+        <p className="text-lg font-medium">{t.noList}</p>
+        <p className="text-sm mt-2">{t.checkTomorrow}</p>
       </div>
     );
   }
@@ -54,44 +55,29 @@ export function CuratedList({ citySlug }: Props) {
   return (
     <div className="divide-y divide-border/50">
       {places.map((place) => (
-        <CuratedCard key={place.placeId} place={place} />
+        <CuratedCard key={place.placeId} place={place} t={t} />
       ))}
     </div>
   );
 }
 
-function deriveTags(place: CuratedPlace): string[] {
-  const typeMap: Record<string, string> = {
-    cafe: "Café", coffee_shop: "Coffee", bar: "Bar", restaurant: "Restaurant",
-    sauna: "Sauna", bakery: "Bakery", brewery: "Brewery", wine_bar: "Wine Bar",
-    night_club: "Club", food: "Food", meal_takeaway: "Takeaway",
-    pub: "Pub", irish_pub: "Irish Pub", cocktail_bar: "Cocktail Bar",
-    hamburger_restaurant: "Burgers", pizza_restaurant: "Pizza",
-    vietnamese_restaurant: "Vietnamese", eastern_european_restaurant: "Eastern European",
-    seafood_restaurant: "Seafood", sushi_restaurant: "Sushi", ramen_restaurant: "Ramen",
-    chinese_restaurant: "Chinese", japanese_restaurant: "Japanese", indian_restaurant: "Indian",
-    thai_restaurant: "Thai", mexican_restaurant: "Mexican", italian_restaurant: "Italian",
-    museum: "Museum", church: "Church", castle: "Castle", hotel: "Hotel",
-    food_store: "Food Shop", city_park: "Park", botanical_garden: "Garden",
-    sports_activity_location: "Activity", tourist_attraction: "Attraction",
-    nature_preserve: "Nature", amusement_center: "Amusement", event_venue: "Venue",
-  };
-
-  const typeLabel = typeMap[place.primaryType] ?? place.primaryType.replace(/_/g, " ");
+function deriveTags(place: CuratedPlace, t: ReturnType<typeof getT>): string[] {
+  const typeLabel = (t.typeMap as Record<string, string>)[place.primaryType]
+    ?? place.primaryType.replace(/_/g, " ");
 
   const tags: string[] = [];
   if (typeLabel.trim()) tags.push(typeLabel);
 
-  if (place.reviewCount <= 300) tags.push("Hidden Gem");
-  else if (place.reviewCount <= 1000) tags.push("Local Favorite");
+  if (place.reviewCount <= 300) tags.push(t.tags.hiddenGem);
+  else if (place.reviewCount <= 1000) tags.push(t.tags.localFavorite);
 
-  if (place.score >= 65) tags.push("Must Visit");
+  if (place.score >= 65) tags.push(t.tags.mustVisit);
 
   return tags;
 }
 
-function CuratedCard({ place }: { place: CuratedPlace }) {
-  const tags = deriveTags(place);
+function CuratedCard({ place, t }: { place: CuratedPlace; t: ReturnType<typeof getT> }) {
+  const tags = deriveTags(place, t);
 
   return (
     <div className="flex items-start gap-3 px-3 py-3.5 rounded-lg hover:bg-muted/50 transition-colors -mx-3">

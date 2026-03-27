@@ -2,12 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { CITIES } from "@/lib/cities";
+import type { Locale } from "@/lib/i18n";
 
 interface Props {
   currentSlug: string;
+  locale: Locale;
 }
 
-export function CitySelector({ currentSlug }: Props) {
+export function CitySelector({ currentSlug, locale }: Props) {
   const router = useRouter();
 
   return (
@@ -15,7 +17,7 @@ export function CitySelector({ currentSlug }: Props) {
       {Object.values(CITIES).map((city) => (
         <button
           key={city.slug}
-          onClick={() => router.push(`/${city.slug}`)}
+          onClick={() => router.push(`/${locale}/${city.slug}`)}
           aria-current={city.slug === currentSlug ? "page" : undefined}
           className={[
             "px-4 py-2.5 min-h-[44px] rounded-full text-sm font-medium transition-colors shrink-0 whitespace-nowrap",

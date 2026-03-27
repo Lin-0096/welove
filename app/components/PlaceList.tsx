@@ -5,13 +5,16 @@ import { PlaceCategory } from "@/lib/google-places";
 import { CuratedPlace } from "@/lib/types";
 import { rankClass } from "@/lib/rank";
 import { OpeningHours } from "./OpeningHours";
+import { getT, type Locale } from "@/lib/i18n";
 
 interface Props {
   category: PlaceCategory;
   citySlug: string;
+  locale: Locale;
 }
 
-export function PlaceList({ category, citySlug }: Props) {
+export function PlaceList({ category, citySlug, locale }: Props) {
+  const t = getT(locale);
   const [places, setPlaces] = useState<CuratedPlace[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,13 +33,13 @@ export function PlaceList({ category, citySlug }: Props) {
   }, [category, citySlug]);
 
   if (loading) return <LoadingSkeleton />;
-  if (error) return <ErrorState message={error} />;
+  if (error) return <ErrorState message={t.errorPlace} />;
 
   if (places.length === 0) {
     return (
       <div className="py-16 text-muted-foreground">
-        <p className="text-lg font-medium">No curated list yet</p>
-        <p className="text-sm mt-2">Our picks are updated daily. Check back tomorrow.</p>
+        <p className="text-lg font-medium">{t.noList}</p>
+        <p className="text-sm mt-2">{t.checkTomorrow}</p>
       </div>
     );
   }

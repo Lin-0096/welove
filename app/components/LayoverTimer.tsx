@@ -28,7 +28,12 @@ function computeCountdown(targetTime: string): Countdown | null {
 
 const STORAGE_KEY = "layover-return-time";
 
-export function LayoverTimer() {
+interface Props {
+  backByLabel: string;
+  tomorrowLabel: string;
+}
+
+export function LayoverTimer({ backByLabel, tomorrowLabel }: Props) {
   const [targetTime, setTargetTime] = useState("");
   const [countdown, setCountdown] = useState<Countdown | null>(null);
 
@@ -64,7 +69,7 @@ export function LayoverTimer() {
         htmlFor="layover-time"
         className="text-xs font-medium uppercase tracking-[0.15em] text-muted-foreground shrink-0"
       >
-        Back by
+        {backByLabel}
       </label>
       <input
         id="layover-time"
@@ -82,7 +87,7 @@ export function LayoverTimer() {
           {countdown.display}
           {countdown.tomorrow && (
             <span className="ml-1.5 text-xs font-sans font-medium text-muted-foreground align-middle">
-              tomorrow
+              {tomorrowLabel}
             </span>
           )}
         </span>
