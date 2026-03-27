@@ -56,16 +56,16 @@ async function analyzeBatchOnce(places: PlaceInput[]): Promise<AnalysisResult[]>
     messages: [
       {
         role: "user",
-        content: `Analyze these places in Finland and assess each one's appeal and uniqueness.
+        content: `Analyze these places in Finland. The goal is to find spots that locals genuinely go to on a regular basis — their everyday favorites for food, coffee, and drinks — not tourist traps or one-time novelties.
 
 Places:
 ${JSON.stringify(placesJson, null, 2)}
 
 For each place evaluate:
-- uniqueness (1-10): How memorable and worth-visiting is this place vs a generic chain?
-- appeal (1-10): Based on ratings and review volume, how much do people genuinely love this place?
-- tags: 2-4 short descriptive labels (e.g. "highly rated", "popular", "chain store", "historic", "cozy", "great food")
-- redFlag: true only if it's a well-known global chain (McDonald's, Starbucks) or clearly low quality
+- uniqueness (1-10): Is this a place worth going out of your way for, or just another generic option?
+- appeal (1-10): Would a local resident choose this place for a regular outing with friends or family? Consider ratings and review volume as evidence of genuine repeat patronage.
+- tags: 2-4 short descriptive labels (e.g. "local staple", "popular", "great food", "cozy", "lively", "chain")
+- redFlag: true only if it's a well-known global chain (McDonald's, Starbucks, Burger King, etc.) or clearly low quality
 
 Use the submit_analysis tool with your assessment for all ${places.length} places.`,
       },
