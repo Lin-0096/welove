@@ -24,7 +24,14 @@ export default async function CityPage({ params }: Props) {
   const t = getT(locale);
 
   return (
-    <main id="main" className="min-h-screen bg-background">
+    <>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-brand focus:text-brand-foreground focus:rounded focus:text-sm focus:font-medium focus:shadow-lg"
+      >
+        {t.skipToContent}
+      </a>
+      <main id="main" className="min-h-screen bg-background">
       <div className="max-w-2xl mx-auto px-4 py-5 sm:py-8">
         <div className="mb-8 sm:mb-10">
           <div className="flex items-center justify-between mb-3">
@@ -42,8 +49,8 @@ export default async function CityPage({ params }: Props) {
           <div className="mt-5">
             <CitySelector currentSlug={city.slug} locale={locale} />
           </div>
-          <div className="mt-4 flex flex-col gap-3">
-            <WeatherWidget city={city} />
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+            <WeatherWidget city={city} locale={locale} />
             <LayoverTimer backByLabel={t.backBy} tomorrowLabel={t.tomorrow} />
           </div>
         </div>
@@ -53,18 +60,21 @@ export default async function CityPage({ params }: Props) {
             variant="line"
             className="w-full mb-6 gap-0 border-b border-border rounded-none"
           >
-            <TabsTrigger value="cafe" className="flex-1 gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[375px]:text-sm">
-              <Coffee className="size-3.5 shrink-0" aria-hidden="true" />{t.tabs.cafe}
+            <TabsTrigger value="cafe" className="flex-1 min-[480px]:gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[480px]:text-sm">
+              <Coffee className="size-3.5 shrink-0" aria-hidden="true" />
+              <span className="max-[479px]:sr-only">{t.tabs.cafe}</span>
             </TabsTrigger>
-            <TabsTrigger value="bar" className="flex-1 gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[375px]:text-sm">
-              <Wine className="size-3.5 shrink-0" aria-hidden="true" />{t.tabs.bar}
+            <TabsTrigger value="bar" className="flex-1 min-[480px]:gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[480px]:text-sm">
+              <Wine className="size-3.5 shrink-0" aria-hidden="true" />
+              <span className="max-[479px]:sr-only">{t.tabs.bar}</span>
             </TabsTrigger>
-            <TabsTrigger value="restaurant" className="flex-1 gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[375px]:text-sm">
-              <Utensils className="size-3.5 shrink-0" aria-hidden="true" />{t.tabs.restaurant}
+            <TabsTrigger value="restaurant" className="flex-1 min-[480px]:gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[480px]:text-sm">
+              <Utensils className="size-3.5 shrink-0" aria-hidden="true" />
+              <span className="max-[479px]:sr-only">{t.tabs.restaurant}</span>
             </TabsTrigger>
-            <TabsTrigger value="curated" className="flex-1 gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[375px]:text-sm">
+            <TabsTrigger value="curated" className="flex-1 min-[480px]:gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[480px]:text-sm">
               <Heart className="size-3.5 shrink-0" aria-hidden="true" />
-              {t.tabs.curated}
+              <span className="max-[479px]:sr-only">{t.tabs.curated}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -90,6 +100,7 @@ export default async function CityPage({ params }: Props) {
         </Tabs>
       </div>
     </main>
+    </>
   );
 }
 

@@ -5,7 +5,7 @@ import { PlaceCategory } from "@/lib/google-places";
 import { CuratedPlace } from "@/lib/types";
 import { rankClass } from "@/lib/rank";
 import { OpeningHours } from "./OpeningHours";
-import { getT, type Locale } from "@/lib/i18n";
+import { getT, HTML_LANG, type Locale } from "@/lib/i18n";
 
 interface Props {
   category: PlaceCategory;
@@ -22,7 +22,7 @@ export function PlaceList({ category, citySlug, locale }: Props) {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch(`/api/places?category=${category}&city=${citySlug}`)
+    fetch(`/api/places?category=${category}&city=${citySlug}&locale=${locale}`)
       .then((r) => r.json())
       .then((data) => {
         if (data.error) throw new Error(data.error);
@@ -45,32 +45,38 @@ export function PlaceList({ category, citySlug, locale }: Props) {
   }
 
   return (
-    <div className="divide-y divide-border/50">
+    <ul className="divide-y divide-border/50">
       {places.map((place) => (
-        <PlaceRow key={place.placeId} place={place} />
+        <PlaceRow key={place.placeId} place={place} locale={locale} />
       ))}
-    </div>
+    </ul>
   );
 }
 
-function PlaceRow({ place }: { place: CuratedPlace }) {
+function PlaceRow({ place, locale }: { place: CuratedPlace; locale: Locale }) {
+  const t = getT(locale);
+  const bcp47 = HTML_LANG[locale];
+
   return (
-    <div className="flex items-start gap-3 px-3 py-3.5 rounded-lg hover:bg-muted/50 transition-colors -mx-3">
-      <span className={`font-display font-black text-xl leading-none shrink-0 w-7 mt-0.5 tabular-nums ${rankClass(place.rank)}`}>
+    <li className="flex items-start gap-3 px-3 py-3.5 rounded-lg hover:bg-muted/50 transition-colors -mx-3 list-none">
+      <span
+        aria-label={`Ranked ${place.rank}`}
+        className={`font-display font-black text-xl leading-none shrink-0 w-7 mt-0.5 tabular-nums ${rankClass(place.rank)}`}
+      >
         {place.rank}
       </span>
       <div className="min-w-0 flex-1">
         <h3 className="font-display font-bold text-lg leading-tight">{place.name}</h3>
         <p className="text-xs text-muted-foreground mt-0.5 tabular-nums">
-          {place.reviewCount.toLocaleString()} reviews ·{" "}
+          {place.reviewCount.toLocaleString(bcp47)} {t.reviewsLabel} ·{" "}
           <span aria-label={`Rated ${place.rating.toFixed(1)} out of 5`}>
             {place.rating.toFixed(1)}★
           </span>
         </p>
         <p className="text-base text-foreground/75 mt-1.5 leading-snug">{place.reason}</p>
-        <OpeningHours weeklyHours={place.weeklyHours} specialDays={place.specialDays} />
+        <OpeningHours weeklyHours={place.weeklyHours} specialDays={place.specialDays} locale={locale} />
       </div>
-    </div>
+    </li>
   );
 }
 
@@ -88,8 +94,7 @@ function LoadingSkeleton() {
 function ErrorState({ message }: { message: string }) {
   return (
     <div className="py-12 text-destructive">
-      <p className="font-medium">Failed to load places</p>
-      <p className="text-sm mt-1 text-muted-foreground">{message}</p>
+      <p className="font-medium">{message}</p>
     </div>
   );
 }

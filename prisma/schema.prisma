@@ -37,6 +37,8 @@ model CuratedPlace {
   primaryType String
   score       Float
   reason      String
+  reasonFi    String   @default("")
+  reasonZh    String   @default("")
   rank        Int
   weeklyHours String[] @default([])
   specialDays String[] @default([])

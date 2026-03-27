@@ -12,10 +12,8 @@ interface Props {
   locale: Locale;
 }
 
-const HIGHLIGHTED_TAGS = new Set(["Must Visit"]);
-
-function tagClass(tag: string): string {
-  if (HIGHLIGHTED_TAGS.has(tag)) {
+function tagClass(highlighted: boolean): string {
+  if (highlighted) {
     return "bg-status-highlight-bg text-status-highlight-fg border-foreground/15 font-medium";
   }
   return "text-muted-foreground border-border/60";
@@ -30,7 +28,7 @@ export function CuratedList({ citySlug, locale }: Props) {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch(`/api/curated?city=${citySlug}`)
+    fetch(`/api/curated?city=${citySlug}&locale=${locale}`)
       .then((r) => r.json())
       .then((data) => {
         if (data.error) throw new Error(data.error);
@@ -53,35 +51,43 @@ export function CuratedList({ citySlug, locale }: Props) {
   }
 
   return (
-    <div className="divide-y divide-border/50">
+    <ul className="divide-y divide-border/50" aria-label="Curated places">
       {places.map((place) => (
-        <CuratedCard key={place.placeId} place={place} t={t} />
+        <CuratedCard key={place.placeId} place={place} t={t} locale={locale} />
       ))}
-    </div>
+    </ul>
   );
 }
 
-function deriveTags(place: CuratedPlace, t: ReturnType<typeof getT>): string[] {
+interface TagItem {
+  text: string;
+  highlight: boolean;
+}
+
+function deriveTags(place: CuratedPlace, t: ReturnType<typeof getT>): TagItem[] {
   const typeLabel = (t.typeMap as Record<string, string>)[place.primaryType]
     ?? place.primaryType.replace(/_/g, " ");
 
-  const tags: string[] = [];
-  if (typeLabel.trim()) tags.push(typeLabel);
+  const tags: TagItem[] = [];
+  if (typeLabel.trim()) tags.push({ text: typeLabel, highlight: false });
 
-  if (place.reviewCount <= 300) tags.push(t.tags.hiddenGem);
-  else if (place.reviewCount <= 1000) tags.push(t.tags.localFavorite);
+  if (place.reviewCount <= 300) tags.push({ text: t.tags.hiddenGem, highlight: false });
+  else if (place.reviewCount <= 1000) tags.push({ text: t.tags.localFavorite, highlight: false });
 
-  if (place.score >= 65) tags.push(t.tags.mustVisit);
+  if (place.score >= 65) tags.push({ text: t.tags.mustVisit, highlight: true });
 
   return tags;
 }
 
-function CuratedCard({ place, t }: { place: CuratedPlace; t: ReturnType<typeof getT> }) {
+function CuratedCard({ place, t, locale }: { place: CuratedPlace; t: ReturnType<typeof getT>; locale: Locale }) {
   const tags = deriveTags(place, t);
 
   return (
-    <div className="flex items-start gap-3 px-3 py-3.5 rounded-lg hover:bg-muted/50 transition-colors -mx-3">
-      <span className={`font-display font-black text-xl leading-none shrink-0 w-7 mt-0.5 tabular-nums ${rankClass(place.rank)}`}>
+    <li className="flex items-start gap-3 px-3 py-3.5 rounded-lg hover:bg-muted/50 transition-colors -mx-3 list-none">
+      <span
+        aria-label={`Ranked ${place.rank}`}
+        className={`font-display font-black text-xl leading-none shrink-0 w-7 mt-0.5 tabular-nums ${rankClass(place.rank)}`}
+      >
         {place.rank}
       </span>
       <div className="min-w-0 flex-1">
@@ -95,20 +101,20 @@ function CuratedCard({ place, t }: { place: CuratedPlace; t: ReturnType<typeof g
           </span>
         </div>
         <div className="flex flex-wrap gap-1 mt-1.5">
-          {tags.map((tag) => (
+          {tags.map(({ text, highlight }) => (
             <Badge
-              key={tag}
+              key={text}
               variant="outline"
-              className={`text-xs px-1.5 py-0 ${tagClass(tag)}`}
+              className={`text-xs px-1.5 py-0 ${tagClass(highlight)}`}
             >
-              {tag}
+              {text}
             </Badge>
           ))}
         </div>
         <p className="text-base text-foreground/75 mt-1.5 leading-snug">{place.reason}</p>
-        <OpeningHours weeklyHours={place.weeklyHours} specialDays={place.specialDays} />
+        <OpeningHours weeklyHours={place.weeklyHours} specialDays={place.specialDays} locale={locale} />
       </div>
-    </div>
+    </li>
   );
 }
 

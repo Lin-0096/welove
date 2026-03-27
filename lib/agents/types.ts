@@ -28,5 +28,7 @@ export interface CuratedEntry {
   primaryType: string;
   score: number;
   reason: string;
+  reasonFi: string;
+  reasonZh: string;
   rank: number;
 }

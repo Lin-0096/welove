@@ -24,9 +24,9 @@ export function LanguageSwitcher({ currentLocale }: Props) {
         <button
           key={locale}
           onClick={() => switchLocale(locale)}
-          aria-current={locale === currentLocale ? "true" : undefined}
+          aria-pressed={locale === currentLocale}
           className={[
-            "px-2 py-1 text-xs font-medium tracking-wide transition-colors",
+            "px-2 min-h-[44px] min-w-[44px] text-xs font-medium tracking-wide transition-colors rounded focus:outline-none focus:ring-1 focus:ring-brand focus:ring-offset-1",
             locale === currentLocale
               ? "text-foreground"
               : "text-muted-foreground hover:text-foreground",

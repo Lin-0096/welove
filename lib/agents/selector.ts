@@ -37,10 +37,18 @@ export async function selectPlaces(scored: ScoredPlace[], cityName: string, fina
                   placeId: { type: "string" },
                   reason: {
                     type: "string",
-                    description: "One sentence explaining why this place made the list",
+                    description: "One sentence in English explaining why locals love this place",
+                  },
+                  reasonFi: {
+                    type: "string",
+                    description: "Same sentence in Finnish",
+                  },
+                  reasonZh: {
+                    type: "string",
+                    description: "Same sentence in Simplified Chinese",
                   },
                 },
-                required: ["placeId", "reason"],
+                required: ["placeId", "reason", "reasonFi", "reasonZh"],
               },
             },
           },
@@ -63,7 +71,7 @@ Rules:
 1. Follow the scores — they reflect genuine popularity (ratings × review volume). Higher score = more locals love it.
 2. Avoid well-known global chains (McDonald's, Starbucks, etc.) — locals skip these.
 3. Ensure no duplicates — if two entries are clearly the same place, keep the higher-scored one.
-4. Write one sentence explaining why locals keep coming back to this place.
+4. For each place, write one sentence explaining why locals keep coming back, in three languages: English (reason), Finnish (reasonFi), and Simplified Chinese (reasonZh). The meaning should be the same in all three.
 
 Submit exactly ${finalCount} places using submit_curated_list, ranked best first.`,
       },
@@ -75,7 +83,7 @@ Submit exactly ${finalCount} places using submit_curated_list, ranked best first
     throw new Error("Selector: no tool_use response");
   }
 
-  const input = toolUse.input as { selected: { placeId: string; reason: string }[] };
+  const input = toolUse.input as { selected: { placeId: string; reason: string; reasonFi: string; reasonZh: string }[] };
   const scoreMap = new Map(scored.map((p) => [p.id, p]));
 
   const seen = new Set<string>();
@@ -96,6 +104,8 @@ Submit exactly ${finalCount} places using submit_curated_list, ranked best first
         primaryType: place.primaryType,
         score: place.score,
         reason: s.reason,
+        reasonFi: s.reasonFi ?? "",
+        reasonZh: s.reasonZh ?? "",
         rank: i + 1,
       } satisfies CuratedEntry;
     })

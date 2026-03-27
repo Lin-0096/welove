@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCity } from "@/lib/cities";
+import { isValidLocale } from "@/lib/i18n";
 
 export async function GET(request: NextRequest) {
-  const citySlug = request.nextUrl.searchParams.get("city") ?? "helsinki";
+  const { searchParams } = request.nextUrl;
+  const citySlug = searchParams.get("city") ?? "helsinki";
+  const localeParam = searchParams.get("locale") ?? "en";
+  const locale = isValidLocale(localeParam) ? localeParam : "en";
 
   const city = getCity(citySlug);
   if (!city) {
@@ -19,14 +23,22 @@ export async function GET(request: NextRequest) {
     const excludedIds = new Set(categoryPlaces.map((p) => p.placeId));
 
     // People Love: general list excluding anything already in a category tab
-    const places = await db.curatedPlace.findMany({
+    const rows = await db.curatedPlace.findMany({
       where: { citySlug, category: null },
       orderBy: { rank: "asc" },
     });
 
-    const filtered = places.filter((p) => !excludedIds.has(p.placeId));
+    const places = rows
+      .filter((p) => !excludedIds.has(p.placeId))
+      .map(({ reasonFi, reasonZh, ...p }) => ({
+        ...p,
+        reason:
+          locale === "fi" ? (reasonFi || p.reason) :
+          locale === "zh" ? (reasonZh || p.reason) :
+          p.reason,
+      }));
 
-    return NextResponse.json({ places: filtered, citySlug });
+    return NextResponse.json({ places, citySlug });
   } catch (err) {
     console.error("[/api/curated]", err);
     return NextResponse.json({ error: "Failed to fetch curated places" }, { status: 500 });

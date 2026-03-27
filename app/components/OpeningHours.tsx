@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { ChevronDown, ChevronUp, Clock } from "lucide-react";
+import { getT, type Locale } from "@/lib/i18n";
 
 interface Props {
   weeklyHours: string[];
   specialDays: string[];
+  locale: Locale;
 }
 
 function getTodayHours(weeklyHours: string[], todayIdx: number): string | null {
@@ -50,8 +52,9 @@ function getUpcomingSpecialDays(specialDays: string[], now: Date): string[] {
   });
 }
 
-export function OpeningHours({ weeklyHours, specialDays }: Props) {
+export function OpeningHours({ weeklyHours, specialDays, locale }: Props) {
   const [showAll, setShowAll] = useState(false);
+  const h = getT(locale).hours;
 
   if (!weeklyHours.length) return null;
 
@@ -68,25 +71,25 @@ export function OpeningHours({ weeklyHours, specialDays }: Props) {
       <div className="flex items-center gap-2">
         {/* Status dot */}
         {isOpen === true ? (
-          <span className="relative flex h-2 w-2 shrink-0">
+          <span className="relative flex h-2 w-2 shrink-0" role="img" aria-label={h.openNow}>
             <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-status-open-ping opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-status-open" />
           </span>
         ) : isOpen === false ? (
-          <span className="inline-flex rounded-full h-2 w-2 shrink-0 bg-status-closed" />
+          <span className="inline-flex rounded-full h-2 w-2 shrink-0 bg-status-closed" role="img" aria-label={h.closedNow} />
         ) : (
-          <span className="inline-flex rounded-full h-2 w-2 shrink-0 bg-muted-foreground/25" />
+          <span className="inline-flex rounded-full h-2 w-2 shrink-0 bg-muted-foreground/25" role="img" aria-label={h.unknownStatus} />
         )}
 
         <Clock className="size-3 shrink-0 text-muted-foreground/50" aria-hidden="true" />
         <span className="text-xs text-muted-foreground leading-none">
-          {todayHours ?? "No hours info"}
+          {todayHours ?? h.noInfo}
         </span>
 
         <button
           onClick={() => setShowAll((v) => !v)}
           className="text-muted-foreground/65 hover:text-muted-foreground transition-colors ml-auto cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-end -mr-2"
-          aria-label={showAll ? "Hide weekly hours" : "Show weekly hours"}
+          aria-label={showAll ? h.hideWeekly : h.showWeekly}
         >
           {showAll ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
         </button>
@@ -94,7 +97,7 @@ export function OpeningHours({ weeklyHours, specialDays }: Props) {
 
       {upcomingSpecialDays.length > 0 && (
         <p className="text-xs text-muted-foreground mt-1">
-          Special hours upcoming ({upcomingSpecialDays.map((d) => d.slice(5).replace("-", "/")).join(", ")})
+          {h.specialUpcoming(upcomingSpecialDays.map((d) => d.slice(5).replace("-", "/")).join(", "))}
         </p>
       )}
 

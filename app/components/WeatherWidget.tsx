@@ -2,26 +2,19 @@
 
 import { useEffect, useState } from "react";
 import type { CityConfig } from "@/lib/cities";
-
-const WMO_LABELS: Record<number, string> = {
-  0: "Clear sky",
-  1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
-  45: "Fog", 48: "Icy fog",
-  51: "Light drizzle", 53: "Drizzle", 55: "Heavy drizzle",
-  61: "Light rain", 63: "Rain", 65: "Heavy rain",
-  71: "Light snow", 73: "Snow", 75: "Heavy snow",
-  77: "Snow grains",
-  80: "Showers", 81: "Rain showers", 82: "Heavy showers",
-  85: "Snow showers", 86: "Heavy snow showers",
-  95: "Thunderstorm", 96: "Thunderstorm w/ hail", 99: "Thunderstorm w/ heavy hail",
-};
+import { WMO_LABELS, type Locale } from "@/lib/i18n";
 
 interface WeatherData {
   temperature: number;
   weatherCode: number;
 }
 
-export function WeatherWidget({ city }: { city: CityConfig }) {
+interface Props {
+  city: CityConfig;
+  locale: Locale;
+}
+
+export function WeatherWidget({ city, locale }: Props) {
   const [weather, setWeather] = useState<WeatherData | null>(null);
 
   useEffect(() => {
@@ -44,9 +37,15 @@ export function WeatherWidget({ city }: { city: CityConfig }) {
     return () => controller.abort();
   }, [city.slug]);
 
-  if (!weather) return <span className="block min-h-[1.25rem]" aria-hidden="true" />;
+  if (!weather) {
+    return (
+      <span className="block min-h-[1.25rem]" role="status">
+        <span className="sr-only">Loading weather…</span>
+      </span>
+    );
+  }
 
-  const label = WMO_LABELS[weather.weatherCode] ?? "—";
+  const label = WMO_LABELS[locale][weather.weatherCode] ?? "—";
 
   return (
     <span className="text-sm text-muted-foreground">
