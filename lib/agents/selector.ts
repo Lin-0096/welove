@@ -78,7 +78,13 @@ Submit exactly ${finalCount} places using submit_curated_list, ranked best first
   const input = toolUse.input as { selected: { placeId: string; reason: string }[] };
   const scoreMap = new Map(scored.map((p) => [p.id, p]));
 
+  const seen = new Set<string>();
   return input.selected
+    .filter((s) => {
+      if (seen.has(s.placeId)) return false;
+      seen.add(s.placeId);
+      return true;
+    })
     .map((s, i) => {
       const place = scoreMap.get(s.placeId);
       if (!place) return null;
