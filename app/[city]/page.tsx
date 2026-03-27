@@ -4,6 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlaceList } from "../components/PlaceList";
 import { CuratedList } from "../components/CuratedList";
 import { CitySelector } from "../components/CitySelector";
+import { WeatherWidget } from "../components/WeatherWidget";
+import { LayoverTimer } from "../components/LayoverTimer";
 import { getCity } from "@/lib/cities";
 
 interface Props {
@@ -31,6 +33,10 @@ export default async function CityPage({ params }: Props) {
           </p>
           <div className="mt-5">
             <CitySelector currentSlug={city.slug} />
+          </div>
+          <div className="mt-4 flex flex-col gap-3">
+            <WeatherWidget city={city} />
+            <LayoverTimer />
           </div>
         </div>
 

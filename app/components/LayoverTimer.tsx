@@ -1,0 +1,92 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+function pad(n: number) {
+  return String(n).padStart(2, "0");
+}
+
+interface Countdown {
+  display: string;
+  tomorrow: boolean;
+}
+
+function computeCountdown(targetTime: string): Countdown | null {
+  if (!targetTime) return null;
+  const [h, m] = targetTime.split(":").map(Number);
+  const now = new Date();
+  const target = new Date(now);
+  target.setHours(h, m, 0, 0);
+  const tomorrow = target.getTime() <= now.getTime();
+  if (tomorrow) target.setDate(target.getDate() + 1);
+  const diff = target.getTime() - now.getTime();
+  const hours = Math.floor(diff / 3_600_000);
+  const minutes = Math.floor((diff % 3_600_000) / 60_000);
+  const seconds = Math.floor((diff % 60_000) / 1_000);
+  return { display: `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`, tomorrow };
+}
+
+const STORAGE_KEY = "layover-return-time";
+
+export function LayoverTimer() {
+  const [targetTime, setTargetTime] = useState("");
+  const [countdown, setCountdown] = useState<Countdown | null>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) setTargetTime(saved);
+  }, []);
+
+  useEffect(() => {
+    if (!targetTime) {
+      setCountdown(null);
+      return;
+    }
+    const tick = () => setCountdown(computeCountdown(targetTime));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [targetTime]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setTargetTime(value);
+    if (value) {
+      localStorage.setItem(STORAGE_KEY, value);
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-3 flex-wrap">
+      <label
+        htmlFor="layover-time"
+        className="text-xs font-medium uppercase tracking-[0.15em] text-muted-foreground shrink-0"
+      >
+        Back by
+      </label>
+      <input
+        id="layover-time"
+        type="time"
+        value={targetTime}
+        onChange={handleChange}
+        className="bg-transparent text-sm font-medium text-foreground border-b border-border focus:outline-none focus:ring-1 focus:ring-brand focus:ring-offset-1 rounded-none"
+      />
+      {countdown && (
+        <span
+          aria-live="off"
+          aria-label={`Time remaining: ${countdown.display}`}
+          className="font-display text-2xl font-bold tabular-nums leading-none"
+        >
+          {countdown.display}
+          {countdown.tomorrow && (
+            <span className="ml-1.5 text-xs font-sans font-medium text-muted-foreground align-middle">
+              tomorrow
+            </span>
+          )}
+        </span>
+      )}
+    </div>
+  );
+}
