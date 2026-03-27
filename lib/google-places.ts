@@ -208,52 +208,30 @@ export function applyDiscoverAlgorithm(pool: Place[]): Place[] {
 }
 
 const CATEGORY_TARGET = 100;
-const CATEGORY_MAX_PAGES = 5; // 5 × 20 = 100
+
+// Nearby place types per category — catches places text search misses
+const CATEGORY_NEARBY_TYPES: Record<PlaceCategory, string[]> = {
+  cafe: ["cafe", "coffee_shop", "bakery"],
+  bar: ["bar", "night_club"],
+  restaurant: [
+    "restaurant", "vietnamese_restaurant", "korean_restaurant",
+    "japanese_restaurant", "chinese_restaurant", "thai_restaurant",
+    "italian_restaurant", "indian_restaurant", "mexican_restaurant",
+    "hamburger_restaurant", "pizza_restaurant", "seafood_restaurant",
+  ],
+};
 
 export async function getCategoryPlaces(
   city: CityConfig,
   category: PlaceCategory
 ): Promise<Place[]> {
-  const collected: Place[] = [];
-  let pageToken: string | undefined;
+  // Run text search and nearby search in parallel
+  const [textPlaces, nearbyPlaces] = await Promise.all([
+    fetchText(city, CATEGORY_QUERY[category]),
+    fetchNearby(city, CATEGORY_NEARBY_TYPES[category]),
+  ]);
 
-  for (let page = 0; page < CATEGORY_MAX_PAGES; page++) {
-    const body: Record<string, unknown> = {
-      textQuery: `${CATEGORY_QUERY[category]} in ${city.name} Finland`,
-      rankPreference: "RELEVANCE",
-      maxResultCount: 20,
-      locationBias: {
-        circle: { center: city.center, radius: city.radius },
-      },
-    };
-    if (pageToken) body.pageToken = pageToken;
-
-    const res = await fetch(`${BASE_URL}/places:searchText`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Goog-Api-Key": API_KEY,
-        "X-Goog-FieldMask": FIELD_MASK,
-      },
-      body: JSON.stringify(body),
-      // Only cache the first page; page tokens are ephemeral
-      next: page === 0 ? { revalidate: 3600 } : { revalidate: 0 },
-    });
-
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(`Google Places API error (page ${page + 1}): ${res.status} ${err}`);
-    }
-
-    const data = await res.json();
-    const batch = (data.places ?? []) as Record<string, unknown>[];
-    collected.push(...batch.map(mapPlace));
-
-    pageToken = data.nextPageToken as string | undefined;
-    if (!pageToken || batch.length === 0) break;
-  }
-
-  return dedupe(collected)
+  return dedupe([...textPlaces, ...nearbyPlaces])
     .filter((p) => p.rating > 0)
     .sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount)
     .slice(0, CATEGORY_TARGET);
