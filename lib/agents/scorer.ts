@@ -14,7 +14,7 @@ function growthScore(delta: number): number {
 }
 
 export function scorePlaces(places: AnalyzedPlace[]): ScoredPlace[] {
-  const filtered = places.filter((p) => !p.redFlag && p.rating >= 3.5);
+  const filtered = places.filter((p) => !p.redFlag && p.rating >= 3.5 && p.reviewCount >= 200);
 
   // Global mean rating across the filtered set
   const globalMean = filtered.length > 0
