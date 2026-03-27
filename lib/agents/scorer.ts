@@ -1,6 +1,6 @@
 import { AnalyzedPlace, ScoredPlace } from "./types";
 
-const BAYESIAN_M = 100; // minimum review threshold
+const BAYESIAN_M = 300; // minimum review threshold
 
 // Bayesian average: pulls low-review places toward the global mean
 function bayesianRating(rating: number, reviewCount: number, globalMean: number): number {
@@ -23,15 +23,15 @@ export function scorePlaces(places: AnalyzedPlace[]): ScoredPlace[] {
 
   return filtered
     .map((p) => {
-      // Quality: 60 pts — Bayesian-adjusted rating
+      // Quality: 80 pts — Bayesian-adjusted rating (primary signal)
       const bRating = bayesianRating(p.rating, p.reviewCount, globalMean);
-      const quality = (bRating / 5) * 60;
+      const quality = (bRating / 5) * 80;
 
-      // Growth: 15 pts — recent momentum
-      const growth = growthScore(p.reviewCountDelta) * 15;
+      // Growth: 10 pts — recent momentum
+      const growth = growthScore(p.reviewCountDelta) * 10;
 
-      // Semantic: 25 pts — AI uniqueness + appeal
-      const semantic = ((p.uniqueness + p.appeal) / 20) * 25;
+      // Semantic: 10 pts — AI uniqueness + appeal (tiebreaker only)
+      const semantic = ((p.uniqueness + p.appeal) / 20) * 10;
 
       const score = Math.round(quality + growth + semantic);
 
