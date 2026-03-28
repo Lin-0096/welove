@@ -119,6 +119,7 @@ async function fetchNearby(city: CityConfig, includedTypes: string[]): Promise<P
       "X-Goog-Api-Key": API_KEY,
       "X-Goog-FieldMask": FIELD_MASK,
     },
+    signal: AbortSignal.timeout(30_000),
     body: JSON.stringify({
       includedTypes,
       maxResultCount: 20,
@@ -151,6 +152,7 @@ async function fetchText(city: CityConfig, query: string): Promise<Place[]> {
       "X-Goog-Api-Key": API_KEY,
       "X-Goog-FieldMask": FIELD_MASK,
     },
+    signal: AbortSignal.timeout(30_000),
     body: JSON.stringify({
       textQuery: `${query} in ${city.name} Finland`,
       rankPreference: "RELEVANCE",
