@@ -38,9 +38,17 @@ function walkMinutes(distM: number): number {
   return Math.round(distM / 80); // ~80m/min walking pace
 }
 
-// Module-level cache: keyed by "city:locale"
+// Module-level cache: keyed by "city:locale". Capped at MAX_CACHE_SIZE entries.
 const cache = new Map<string, { places: Candidate[]; ts: number }>();
 const CACHE_TTL = 5 * 60 * 1000;
+const MAX_CACHE_SIZE = 20;
+
+function cacheSet(key: string, value: { places: Candidate[]; ts: number }) {
+  if (cache.size >= MAX_CACHE_SIZE) {
+    cache.delete(cache.keys().next().value!);
+  }
+  cache.set(key, value);
+}
 
 export function LayoverPlanner({ citySlug, locale, availableMinutes }: Props) {
   const t = getT(locale);
@@ -64,12 +72,12 @@ export function LayoverPlanner({ citySlug, locale, availableMinutes }: Props) {
       .then((r) => r.json())
       .then((data) => {
         const places = data.places ?? [];
-        cache.set(cacheKey, { places, ts: Date.now() });
+        cacheSet(cacheKey, { places, ts: Date.now() });
         setAll(places);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [citySlug, locale, cacheKey]);
+  }, [citySlug, locale]);
 
   // Filter: time must fit, layoverScore >= 6 (already pre-filtered by API)
   const eligible = useMemo(
@@ -80,13 +88,18 @@ export function LayoverPlanner({ citySlug, locale, availableMinutes }: Props) {
     [all, availableMinutes]
   );
 
-  // Selected candidates
-  const selectedList = eligible.filter((p) => selected.has(p.placeId));
+  // Memoize derived selection metrics — recalculated on every timer tick otherwise
+  const selectedList = useMemo(
+    () => eligible.filter((p) => selected.has(p.placeId)),
+    [eligible, selected]
+  );
 
-  // Time budget: max round-trip transit + sum of stays for selected
-  const maxTransit = selectedList.reduce((max, p) => Math.max(max, p.transitMinutes), 0);
-  const totalUsedMinutes = selectedList.reduce((acc, p) => acc + p.stayMinutes, 0) + maxTransit * 2;
-  const budgetPct = Math.min((totalUsedMinutes / availableMinutes) * 100, 100);
+  const { totalUsedMinutes, budgetPct } = useMemo(() => {
+    const maxTransit = selectedList.reduce((max, p) => Math.max(max, p.transitMinutes), 0);
+    const totalUsedMinutes = selectedList.reduce((acc, p) => acc + p.stayMinutes, 0) + maxTransit * 2;
+    const budgetPct = Math.min((totalUsedMinutes / availableMinutes) * 100, 100);
+    return { totalUsedMinutes, budgetPct };
+  }, [selectedList, availableMinutes]);
 
   const hours = Math.floor(availableMinutes / 60);
   const mins = availableMinutes % 60;
@@ -129,15 +142,11 @@ export function LayoverPlanner({ citySlug, locale, availableMinutes }: Props) {
         <h2 className="font-display text-2xl font-bold tracking-tight leading-tight">
           {t.layover.header(hours, mins)}
         </h2>
-        <p className="text-xs text-muted-foreground mt-1">
-          {eligible.length > 0
-            ? (locale === "zh"
-                ? `${eligible.length} 个地点可纳入行程`
-                : locale === "fi"
-                ? `${eligible.length} paikkaa sopii aikaasi`
-                : `${eligible.length} places fit your window`)
-            : t.layover.noFit}
-        </p>
+        {eligible.length > 0 && (
+          <p className="text-xs text-muted-foreground mt-1">
+            {t.layover.eligibleCount(eligible.length)}
+          </p>
+        )}
       </div>
 
       {eligible.length === 0 ? (
@@ -161,25 +170,13 @@ export function LayoverPlanner({ citySlug, locale, availableMinutes }: Props) {
                     aria-pressed={isSelected}
                     className={`w-full text-left flex items-start gap-3 px-3 py-3.5 rounded-lg transition-colors -mx-3 ${
                       isSelected
-                        ? "bg-brand/8 border-l-2 border-brand ml-[-14px] pl-[14px]"
+                        ? "bg-brand/8 [box-shadow:inset_2px_0_0_var(--color-brand)]"
                         : "hover:bg-muted/50"
                     }`}
                   >
-                    {/* Selection indicator */}
-                    <span
-                      className={`mt-1 shrink-0 size-4 rounded-full border-2 flex items-center justify-center transition-colors ${
-                        isSelected ? "border-brand bg-brand" : "border-border"
-                      }`}
-                      aria-hidden="true"
-                    >
-                      {isSelected && (
-                        <span className="size-1.5 rounded-full bg-white block" />
-                      )}
-                    </span>
-
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
-                        <span className="font-display font-bold text-lg leading-tight">
+                        <span className={`font-display font-bold text-lg leading-tight ${isSelected ? "text-brand" : ""}`}>
                           {place.name}
                         </span>
                         <span className="text-xs text-muted-foreground shrink-0 tabular-nums">
@@ -223,20 +220,18 @@ export function LayoverPlanner({ citySlug, locale, availableMinutes }: Props) {
           </ul>
 
           {/* Time budget footer */}
-          <div className="sticky bottom-0 mt-6 pb-4 pt-3 bg-background border-t border-border">
-            <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-              <span>{t.layover.selectedTime(totalUsedMinutes, availableMinutes)}</span>
-              <span className={budgetPct > 90 ? "text-destructive font-medium" : ""}>
-                {Math.round(budgetPct)}%
-              </span>
-            </div>
-            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+          <div className="sticky bottom-0 mt-6 pb-4 pt-3 bg-background border-t border-border/60">
+            <p className={`text-xs mb-2 ${budgetPct > 90 ? "text-destructive font-medium" : "text-muted-foreground"}`}>
+              {t.layover.selectedTime(totalUsedMinutes, availableMinutes)}
+            </p>
+            <div className="h-px bg-muted overflow-hidden">
               <div
-                className={`h-full rounded-full transition-all duration-300 ${
+                className={`h-full w-full origin-left transition-[transform,background-color] duration-300 ${
                   budgetPct > 90 ? "bg-destructive" : "bg-brand"
                 }`}
-                style={{ width: `${budgetPct}%` }}
+                style={{ transform: `scaleX(${budgetPct / 100})` }}
                 role="progressbar"
+                aria-valuemin={0}
                 aria-valuenow={totalUsedMinutes}
                 aria-valuemax={availableMinutes}
               />

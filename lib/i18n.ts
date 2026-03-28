@@ -60,6 +60,7 @@ const dict = {
       selectedTime: (used: number, total: number) => `${used} min planned · ${total} min window`,
       noFit: "No places fit in your time window",
       walkMin: (m: number) => `${m} min walk`,
+      eligibleCount: (n: number) => `${n} places fit your window`,
     },
     typeMap: {
       cafe: "Café", coffee_shop: "Coffee", bar: "Bar", restaurant: "Restaurant",
@@ -116,6 +117,7 @@ const dict = {
       selectedTime: (used: number, total: number) => `${used} min suunniteltu · ${total} min ikkuna`,
       noFit: "Ei paikkoja aikaikkuna sisällä",
       walkMin: (m: number) => `${m} min kävely`,
+      eligibleCount: (n: number) => `${n} paikkaa sopii aikaasi`,
     },
     typeMap: {
       cafe: "Kahvila", coffee_shop: "Kahvi", bar: "Baari", restaurant: "Ravintola",
@@ -172,6 +174,7 @@ const dict = {
       selectedTime: (used: number, total: number) => `已规划 ${used} 分 · 共 ${total} 分钟`,
       noFit: "时间窗口内暂无合适地点",
       walkMin: (m: number) => `步行${m}分钟`,
+      eligibleCount: (n: number) => `${n} 个地点可纳入行程`,
     },
     typeMap: {
       cafe: "咖啡馆", coffee_shop: "咖啡", bar: "酒吧", restaurant: "餐厅",

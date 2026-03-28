@@ -88,8 +88,6 @@ export function LayoverTimer({ backByLabel, tomorrowLabel, onMinutesChange }: Pr
       />
       {countdown && (
         <span
-          aria-live="off"
-          aria-label={`Time remaining: ${countdown.display}`}
           className="font-display text-2xl font-bold tabular-nums leading-none"
         >
           {countdown.display}

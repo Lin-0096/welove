@@ -8,9 +8,15 @@ import { OpeningHours } from "./OpeningHours";
 import { getT, HTML_LANG, type Locale } from "@/lib/i18n";
 
 // Module-level cache: persists across tab switches in the same session.
-// Key: "city:locale", TTL: 5 minutes.
+// Key: "endpoint:city:locale", TTL: 5 minutes, max 20 entries.
 const cache = new Map<string, { places: CuratedPlace[]; ts: number }>();
 const CACHE_TTL = 5 * 60 * 1000;
+const MAX_CACHE_SIZE = 20;
+
+function cacheSet(key: string, value: { places: CuratedPlace[]; ts: number }) {
+  if (cache.size >= MAX_CACHE_SIZE) cache.delete(cache.keys().next().value!);
+  cache.set(key, value);
+}
 
 interface Props {
   citySlug: string;
@@ -55,7 +61,7 @@ export function CuratedList({ citySlug, locale, endpoint = "/api/curated" }: Pro
       .then((r) => r.json())
       .then((data) => {
         if (data.error) throw new Error(data.error);
-        cache.set(key, { places: data.places, ts: Date.now() });
+        cacheSet(key, { places: data.places, ts: Date.now() });
         setPlaces(data.places);
       })
       .catch((e) => {

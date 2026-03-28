@@ -14,9 +14,15 @@ interface Props {
 }
 
 // Module-level cache: persists across tab switches in the same session.
-// Key: "category:city:locale", TTL: 5 minutes.
+// Key: "category:city:locale", TTL: 5 minutes, max 20 entries.
 const cache = new Map<string, { places: CuratedPlace[]; ts: number }>();
 const CACHE_TTL = 5 * 60 * 1000;
+const MAX_CACHE_SIZE = 20;
+
+function cacheSet(key: string, value: { places: CuratedPlace[]; ts: number }) {
+  if (cache.size >= MAX_CACHE_SIZE) cache.delete(cache.keys().next().value!);
+  cache.set(key, value);
+}
 
 export function PlaceList({ category, citySlug, locale }: Props) {
   const t = getT(locale);
@@ -50,7 +56,7 @@ export function PlaceList({ category, citySlug, locale }: Props) {
       .then((r) => r.json())
       .then((data) => {
         if (data.error) throw new Error(data.error);
-        cache.set(key, { places: data.places, ts: Date.now() });
+        cacheSet(key, { places: data.places, ts: Date.now() });
         setPlaces(data.places);
       })
       .catch((e) => {
