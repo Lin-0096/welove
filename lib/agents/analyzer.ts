@@ -25,7 +25,7 @@ async function analyzeBatchOnce(places: PlaceInput[]): Promise<AnalysisResult[]>
 
   const response = await client.messages.create({
     model: "MiniMax-M2.7-highspeed",
-    max_tokens: 2048,
+    max_tokens: 4096,
     tools: [
       {
         name: "submit_analysis",
@@ -74,7 +74,8 @@ Use the submit_analysis tool with your assessment for all ${places.length} place
 
   const toolUse = response.content.find((b) => b.type === "tool_use");
   if (!toolUse || toolUse.type !== "tool_use") {
-    throw new Error("Analyzer: no tool_use response");
+    const textBlock = response.content.find((b) => b.type === "text");
+    throw new Error(`Analyzer: no tool_use response. Model said: ${(textBlock as { text?: string })?.text?.slice(0, 200) ?? "(no text)"}`);
   }
 
   const input = toolUse.input as { results: AnalysisResult[] };
