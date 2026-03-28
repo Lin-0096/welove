@@ -106,7 +106,7 @@ Submit exactly ${HIDDEN_GEM_COUNT} places using submit_hidden_gems, ranked best 
 const client = new Anthropic();
 const CANDIDATE_MULTIPLIER = 2;
 
-export async function selectPlaces(scored: ScoredPlace[], cityName: string, finalCount = 20): Promise<CuratedEntry[]> {
+export async function selectPlaces(scored: ScoredPlace[], cityName: string, finalCount = 10): Promise<CuratedEntry[]> {
   const candidateCount = finalCount * CANDIDATE_MULTIPLIER;
   const candidates = scored.slice(0, candidateCount).map((p, i) => ({
     rank: i + 1,
@@ -122,7 +122,7 @@ export async function selectPlaces(scored: ScoredPlace[], cityName: string, fina
 
   const response = await client.messages.create({
     model: "MiniMax-M2.7",
-    max_tokens: 4096,
+    max_tokens: 8192,
     tools: [
       {
         name: "submit_curated_list",
