@@ -172,8 +172,9 @@ ${JSON.stringify(candidates, null, 2)}
 Rules:
 1. Follow the scores — they reflect genuine popularity (ratings × review volume). Higher score = more locals love it.
 2. Avoid well-known global chains (McDonald's, Starbucks, etc.) — locals skip these.
-3. Ensure no duplicates — if two entries are clearly the same place, keep the higher-scored one.
-4. For each place, write one sentence explaining why locals keep coming back, in three languages: English (reason), Finnish (reasonFi), and Simplified Chinese (reasonZh). The meaning should be the same in all three.
+3. Never include shopping malls, shopping centres, event venues, stadiums, gyms, or other non-food/drink/culture venues. welove is a food, drink, and local culture guide.
+4. Ensure no duplicates — if two entries are clearly the same place, keep the higher-scored one.
+5. For each place, write one sentence explaining why locals keep coming back, in three languages: English (reason), Finnish (reasonFi), and Simplified Chinese (reasonZh). The meaning should be the same in all three.
 
 Submit exactly ${finalCount} places using submit_curated_list, ranked best first.`,
       },

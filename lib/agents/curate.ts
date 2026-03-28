@@ -7,7 +7,24 @@ import { analyzePlaces } from "./analyzer";
 import { scorePlaces, scoreHiddenGems } from "./scorer";
 import { selectPlaces, selectHiddenGems } from "./selector";
 
-const PRE_FILTER_LIMIT = 20;
+const PRE_FILTER_LIMIT = 20;           // per-category candidate pool
+const DISCOVER_PRE_FILTER_LIMIT = 30;  // discover / People Love candidate pool
+const CURATED_FINAL_COUNT = 20;        // People Love target count
+
+// Allowed primaryType values per category — used to filter Google Places
+// text-search results that may include off-type venues (e.g. shopping malls
+// with coffee shops inside appearing in a "coffee shops" text search).
+const CATEGORY_ALLOWED_TYPES: Record<PlaceCategory, Set<string>> = {
+  cafe: new Set(["cafe", "coffee_shop", "bakery"]),
+  bar: new Set(["bar", "pub", "wine_bar", "cocktail_bar", "night_club", "brewery"]),
+  restaurant: new Set([
+    "restaurant", "vietnamese_restaurant", "korean_restaurant",
+    "japanese_restaurant", "chinese_restaurant", "thai_restaurant",
+    "italian_restaurant", "indian_restaurant", "mexican_restaurant",
+    "hamburger_restaurant", "pizza_restaurant", "seafood_restaurant",
+    "sushi_restaurant", "ramen_restaurant", "fast_food_restaurant",
+  ]),
+};
 
 function prefilterCandidates(rawPlaces: Place[], limit: number): Place[] {
   return [...rawPlaces]
@@ -94,7 +111,7 @@ export async function curateCity(city: CityConfig): Promise<void> {
   ]);
 
   // 2. Pre-filter to top candidates before running AI
-  const candidates = prefilterCandidates(rawPlaces, PRE_FILTER_LIMIT);
+  const candidates = prefilterCandidates(rawPlaces, DISCOVER_PRE_FILTER_LIMIT);
   const rawPlaceMap = new Map(rawPlaces.map((p) => [p.id, p]));
 
   // 3. Build PlaceInput with growth signals and coordinates
@@ -124,8 +141,8 @@ export async function curateCity(city: CityConfig): Promise<void> {
 
   if (scored.length === 0) return;
 
-  // 5. Select final list with Sonnet (diversity + reasons)
-  const curated = await selectPlaces(scored, city.name);
+  // 5. Select final list (diversity + reasons)
+  const curated = await selectPlaces(scored, city.name, CURATED_FINAL_COUNT);
 
   // 6. Persist to DB — replace previous discover curated list for this city
   await db.$transaction([
@@ -160,7 +177,14 @@ export async function curateCategoryForCity(city: CityConfig, category: PlaceCat
     getGrowthMap(city.slug),
   ]);
 
-  const candidates = prefilterCandidates(rawPlaces, PRE_FILTER_LIMIT);
+  // Filter to correct primaryType before ranking — prevents text-search results
+  // like shopping malls (which contain cafés) from polluting category lists.
+  const allowedTypes = CATEGORY_ALLOWED_TYPES[category];
+  const typedPlaces = rawPlaces.filter((p) => allowedTypes.has(p.primaryType));
+  // Fall back to unfiltered if we somehow end up with too few typed results
+  const pool = typedPlaces.length >= PRE_FILTER_LIMIT / 2 ? typedPlaces : rawPlaces;
+
+  const candidates = prefilterCandidates(pool, PRE_FILTER_LIMIT);
   const rawPlaceMap = new Map(rawPlaces.map((p) => [p.id, p]));
 
   const places: PlaceInput[] = candidates.map((p) => {

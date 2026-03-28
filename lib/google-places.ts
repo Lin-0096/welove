@@ -36,16 +36,16 @@ const DISCOVER_TYPE_BATCHES = [
   ["chinese_restaurant", "japanese_restaurant", "italian_restaurant", "mexican_restaurant", "night_club"],
   // Attractions & culture
   ["tourist_attraction", "museum", "art_gallery", "cultural_center", "performing_arts_theater"],
-  ["church", "event_venue"],
+  ["church"],
   // Nature & outdoor
   ["park", "national_park", "botanical_garden", "nature_preserve", "wildlife_refuge"],
   ["beach", "marina", "ski_resort"],
   // Entertainment
-  ["amusement_park", "aquarium", "zoo", "bowling_alley", "movie_theater", "casino"],
-  // Wellness & sport
-  ["spa", "gym", "swimming_pool", "sauna", "stadium"],
-  // Shopping & markets
-  ["shopping_mall", "market"],
+  ["amusement_park", "aquarium", "zoo"],
+  // Wellness & spa
+  ["spa", "swimming_pool", "sauna"],
+  // Markets (food markets only — no shopping malls)
+  ["market"],
 ];
 
 const DISCOVER_TARGET = 50;
