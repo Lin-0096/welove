@@ -46,3 +46,13 @@ model CuratedPlace {
 
   @@index([citySlug, category, curatedAt])
 }
+
+model PlaceMetadata {
+  placeId        String   @id
+  lat            Float
+  lng            Float
+  transitMinutes Int      // Airport (EFHK) → place, public transport
+  stayMinutes    Int      // Recommended visit duration
+  layoverScore   Float    // 1–10, AI-assigned layover friendliness
+  updatedAt      DateTime @updatedAt
+}

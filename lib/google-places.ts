@@ -9,6 +9,8 @@ export interface Place {
   id: string;
   name: string;
   address: string;
+  lat: number;
+  lng: number;
   rating: number;
   reviewCount: number;
   primaryType: string;
@@ -86,10 +88,14 @@ function mapPlace(raw: Record<string, unknown>): Place {
     if (specialDays.length === 0) specialDays = null;
   }
 
+  const location = raw.location as { latitude: number; longitude: number } | undefined;
+
   return {
     id: raw.id as string,
     name: (raw.displayName as { text: string })?.text ?? "Unknown",
     address: (raw.formattedAddress as string) ?? "",
+    lat: location?.latitude ?? 0,
+    lng: location?.longitude ?? 0,
     rating: (raw.rating as number) ?? 0,
     reviewCount: (raw.userRatingCount as number) ?? 0,
     primaryType: (raw.primaryType as string) ?? "",
@@ -104,6 +110,7 @@ const FIELD_MASK = [
   "places.id",
   "places.displayName",
   "places.formattedAddress",
+  "places.location",
   "places.rating",
   "places.userRatingCount",
   "places.primaryType",

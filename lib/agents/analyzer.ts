@@ -10,6 +10,8 @@ interface AnalysisResult {
   appeal: number;
   tags: string[];
   redFlag: boolean;
+  layoverScore: number;
+  stayMinutes: number; // 0 = use type default
 }
 
 async function analyzeBatchOnce(places: PlaceInput[]): Promise<AnalysisResult[]> {
@@ -43,8 +45,10 @@ async function analyzeBatchOnce(places: PlaceInput[]): Promise<AnalysisResult[]>
                   appeal: { type: "number", description: "1-10: would you recommend to a friend" },
                   tags: { type: "array", items: { type: "string" }, description: "2-4 descriptive tags" },
                   redFlag: { type: "boolean", description: "true if obvious tourist trap or low-quality chain" },
+                  layoverScore: { type: "number", description: "1-10: how suitable for a short airport layover visit. High score = iconic/central, fast to see, no reservation needed. Low score = requires planning, long dwell time, or far from transit." },
+                  stayMinutes: { type: "number", description: "Recommended visit duration in minutes. Use 0 to apply type-based default (restaurant=60, cafe=45, bar=60, museum=90, park=30)." },
                 },
-                required: ["placeId", "uniqueness", "appeal", "tags", "redFlag"],
+                required: ["placeId", "uniqueness", "appeal", "tags", "redFlag", "layoverScore", "stayMinutes"],
               },
             },
           },
@@ -66,6 +70,8 @@ For each place evaluate:
 - appeal (1-10): Would a local resident choose this place for a regular outing with friends or family? Consider ratings and review volume as evidence of genuine repeat patronage.
 - tags: 2-4 short descriptive labels (e.g. "local staple", "popular", "great food", "cozy", "lively", "chain")
 - redFlag: true only if it's a well-known global chain (McDonald's, Starbucks, Burger King, etc.) or clearly low quality
+- layoverScore (1-10): how good is this for a traveler with 2-4 hours to kill near Helsinki airport? High = easy to reach by transit, iconic or memorable, can be enjoyed quickly. Low = requires car, long queues, or deep local knowledge.
+- stayMinutes: realistic visit duration. Use 0 if the type default is appropriate.
 
 Use the submit_analysis tool with your assessment for all ${places.length} places.`,
       },
@@ -116,6 +122,8 @@ export async function analyzePlaces(places: PlaceInput[]): Promise<AnalyzedPlace
       appeal: analysis?.appeal ?? 5,
       tags: analysis?.tags ?? [],
       redFlag: analysis?.redFlag ?? false,
+      layoverScore: analysis?.layoverScore ?? 5,
+      stayMinutesOverride: analysis?.stayMinutes && analysis.stayMinutes > 0 ? analysis.stayMinutes : null,
     };
   });
 }

@@ -53,6 +53,14 @@ const dict = {
       showWeekly: "Show weekly hours",
       hideWeekly: "Hide weekly hours",
     },
+    layover: {
+      header: (h: number, m: number) => h > 0 ? `You have ${h}h ${m}min` : `You have ${m} min`,
+      fromAirport: "transit from airport",
+      stayLabel: "stay",
+      selectedTime: (used: number, total: number) => `${used} min planned · ${total} min window`,
+      noFit: "No places fit in your time window",
+      walkMin: (m: number) => `${m} min walk`,
+    },
     typeMap: {
       cafe: "Café", coffee_shop: "Coffee", bar: "Bar", restaurant: "Restaurant",
       sauna: "Sauna", bakery: "Bakery", brewery: "Brewery", wine_bar: "Wine Bar",
@@ -101,6 +109,14 @@ const dict = {
       showWeekly: "Näytä viikkoaikataulu",
       hideWeekly: "Piilota viikkoaikataulu",
     },
+    layover: {
+      header: (h: number, m: number) => h > 0 ? `Sinulla on ${h}t ${m}min` : `Sinulla on ${m} min`,
+      fromAirport: "lentokentältä",
+      stayLabel: "viipymä",
+      selectedTime: (used: number, total: number) => `${used} min suunniteltu · ${total} min ikkuna`,
+      noFit: "Ei paikkoja aikaikkuna sisällä",
+      walkMin: (m: number) => `${m} min kävely`,
+    },
     typeMap: {
       cafe: "Kahvila", coffee_shop: "Kahvi", bar: "Baari", restaurant: "Ravintola",
       sauna: "Sauna", bakery: "Leipomo", brewery: "Panimo", wine_bar: "Viinibaari",
@@ -148,6 +164,14 @@ const dict = {
       specialUpcoming: (dates: string) => `近期特殊营业：${dates}`,
       showWeekly: "查看全周时间",
       hideWeekly: "收起",
+    },
+    layover: {
+      header: (h: number, m: number) => h > 0 ? `你有${h}小时${m}分钟` : `你还有${m}分钟`,
+      fromAirport: "从机场出发",
+      stayLabel: "停留",
+      selectedTime: (used: number, total: number) => `已规划 ${used} 分 · 共 ${total} 分钟`,
+      noFit: "时间窗口内暂无合适地点",
+      walkMin: (m: number) => `步行${m}分钟`,
     },
     typeMap: {
       cafe: "咖啡馆", coffee_shop: "咖啡", bar: "酒吧", restaurant: "餐厅",

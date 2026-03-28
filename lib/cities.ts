@@ -10,7 +10,7 @@ export const CITIES: Record<string, CityConfig> = {
     slug: "helsinki",
     name: "Helsinki",
     center: { latitude: 60.1699, longitude: 24.9384 },
-    radius: 8000,
+    radius: 25000, // covers Helsinki + Espoo metro area
   },
   tampere: {
     slug: "tampere",

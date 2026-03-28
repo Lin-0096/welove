@@ -5,15 +5,19 @@ export interface PlaceInput {
   reviewCount: number;
   primaryType: string;
   address: string;
+  lat: number;
+  lng: number;
   reviewCountDelta: number;
   ratingDelta: number;
 }
 
 export interface AnalyzedPlace extends PlaceInput {
-  uniqueness: number; // 1-10: how distinctive vs generic chain
-  appeal: number;     // 1-10: would you recommend to a friend
-  tags: string[];     // e.g. ["cozy", "local favorite", "hidden gem"]
-  redFlag: boolean;   // tourist trap or low-quality chain
+  uniqueness: number;        // 1-10: how distinctive vs generic chain
+  appeal: number;            // 1-10: would you recommend to a friend
+  tags: string[];
+  redFlag: boolean;          // tourist trap or low-quality chain
+  layoverScore: number;      // 1-10: how suitable for a short layover visit
+  stayMinutesOverride: number | null; // null = use type default
 }
 
 export interface ScoredPlace extends AnalyzedPlace {

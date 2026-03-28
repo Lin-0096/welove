@@ -9,6 +9,7 @@ function pad(n: number) {
 interface Countdown {
   display: string;
   tomorrow: boolean;
+  totalMinutes: number;
 }
 
 function computeCountdown(targetTime: string): Countdown | null {
@@ -23,7 +24,8 @@ function computeCountdown(targetTime: string): Countdown | null {
   const hours = Math.floor(diff / 3_600_000);
   const minutes = Math.floor((diff % 3_600_000) / 60_000);
   const seconds = Math.floor((diff % 60_000) / 1_000);
-  return { display: `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`, tomorrow };
+  const totalMinutes = Math.floor(diff / 60_000);
+  return { display: `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`, tomorrow, totalMinutes };
 }
 
 const STORAGE_KEY = "layover-return-time";
@@ -31,9 +33,10 @@ const STORAGE_KEY = "layover-return-time";
 interface Props {
   backByLabel: string;
   tomorrowLabel: string;
+  onMinutesChange?: (minutes: number | null) => void;
 }
 
-export function LayoverTimer({ backByLabel, tomorrowLabel }: Props) {
+export function LayoverTimer({ backByLabel, tomorrowLabel, onMinutesChange }: Props) {
   const [targetTime, setTargetTime] = useState("");
   const [countdown, setCountdown] = useState<Countdown | null>(null);
 
@@ -45,13 +48,18 @@ export function LayoverTimer({ backByLabel, tomorrowLabel }: Props) {
   useEffect(() => {
     if (!targetTime) {
       setCountdown(null);
+      onMinutesChange?.(null);
       return;
     }
-    const tick = () => setCountdown(computeCountdown(targetTime));
+    const tick = () => {
+      const c = computeCountdown(targetTime);
+      setCountdown(c);
+      onMinutesChange?.(c ? c.totalMinutes : null);
+    };
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, [targetTime]);
+  }, [targetTime, onMinutesChange]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
