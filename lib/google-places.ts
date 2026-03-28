@@ -226,6 +226,30 @@ export async function getCategoryPlaces(
     .slice(0, CATEGORY_TARGET);
 }
 
+const HIDDEN_GEM_MIN_REVIEWS = 30;
+const HIDDEN_GEM_MAX_REVIEWS = 800;
+const HIDDEN_GEM_TARGET = 100;
+
+/**
+ * Hidden gems candidate pool: same wide-net fetch as discover,
+ * but filter to low-review-count places (under the radar).
+ */
+export async function getHiddenGemsCandidates(city: CityConfig): Promise<Place[]> {
+  const batches = await Promise.all(
+    DISCOVER_TYPE_BATCHES.map((types) => fetchNearby(city, types))
+  );
+
+  return dedupe(batches.flat())
+    .filter(
+      (p) =>
+        p.rating >= 4.3 &&
+        p.reviewCount >= HIDDEN_GEM_MIN_REVIEWS &&
+        p.reviewCount <= HIDDEN_GEM_MAX_REVIEWS
+    )
+    .sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount)
+    .slice(0, HIDDEN_GEM_TARGET);
+}
+
 export async function getDiscoverPlaces(city: CityConfig): Promise<Place[]> {
   // Fetch all batches in parallel
   const batches = await Promise.all(

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Coffee, Wine, Utensils, Heart } from "lucide-react";
+import { Coffee, Wine, Utensils, Heart, Sparkles } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlaceList } from "../../components/PlaceList";
 import { CuratedList } from "../../components/CuratedList";
@@ -82,6 +82,12 @@ export default async function CityPage({ params }: Props) {
                 <Heart className="size-3.5 shrink-0" aria-hidden="true" />
                 <span className="max-[479px]:sr-only">{t.tabs.curated}</span>
               </TabsTrigger>
+              {city.slug === "helsinki" && (
+                <TabsTrigger value="hidden-gems" className="flex-1 min-[480px]:gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[480px]:text-sm">
+                  <Sparkles className="size-3.5 shrink-0" aria-hidden="true" />
+                  <span className="max-[479px]:sr-only">{t.tabs.hiddenGems}</span>
+                </TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="cafe">
@@ -103,6 +109,13 @@ export default async function CityPage({ params }: Props) {
               <SectionHeader title={t.sections.curated.title(city.name)} subtitle={t.sections.curated.sub} />
               <CuratedList citySlug={city.slug} locale={locale} />
             </TabsContent>
+
+            {city.slug === "helsinki" && (
+              <TabsContent value="hidden-gems">
+                <SectionHeader title={t.sections.hiddenGems.title(city.name)} subtitle={t.sections.hiddenGems.sub} />
+                <CuratedList citySlug={city.slug} locale={locale} endpoint="/api/hidden-gems" />
+              </TabsContent>
+            )}
           </Tabs>
         </div>
       </main>

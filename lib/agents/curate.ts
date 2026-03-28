@@ -1,10 +1,10 @@
 import { db } from "@/lib/db";
 import { CityConfig, CITIES } from "@/lib/cities";
-import { getDiscoverPlaces, getCategoryPlaces, PlaceCategory } from "@/lib/google-places";
+import { getDiscoverPlaces, getCategoryPlaces, getHiddenGemsCandidates, PlaceCategory } from "@/lib/google-places";
 import { PlaceInput } from "./types";
 import { analyzePlaces } from "./analyzer";
-import { scorePlaces } from "./scorer";
-import { selectPlaces } from "./selector";
+import { scorePlaces, scoreHiddenGems } from "./scorer";
+import { selectPlaces, selectHiddenGems } from "./selector";
 
 async function getGrowthMap(citySlug: string): Promise<Map<string, { reviewCountDelta: number; ratingDelta: number }>> {
   const since = new Date();
@@ -133,6 +133,57 @@ export async function curateCategoryForCity(city: CityConfig, category: PlaceCat
         placeId: e.placeId,
         citySlug: city.slug,
         category,
+        name: e.name,
+        rating: e.rating,
+        reviewCount: e.reviewCount,
+        primaryType: e.primaryType,
+        score: e.score,
+        reason: e.reason,
+        reasonFi: e.reasonFi,
+        reasonZh: e.reasonZh,
+        rank: e.rank,
+        weeklyHours: rawPlaceMap.get(e.placeId)?.weeklyHours ?? [],
+        specialDays: rawPlaceMap.get(e.placeId)?.specialDays ?? [],
+      })),
+    }),
+  ]);
+}
+
+export async function curateHiddenGemsForCity(city: CityConfig): Promise<void> {
+  const [rawPlaces, growthMap] = await Promise.all([
+    getHiddenGemsCandidates(city),
+    getGrowthMap(city.slug),
+  ]);
+
+  const rawPlaceMap = new Map(rawPlaces.map((p) => [p.id, p]));
+
+  const places: PlaceInput[] = rawPlaces.map((p) => {
+    const growth = growthMap.get(p.id) ?? { reviewCountDelta: 0, ratingDelta: 0 };
+    return {
+      id: p.id,
+      name: p.name,
+      rating: p.rating,
+      reviewCount: p.reviewCount,
+      primaryType: p.primaryType,
+      address: p.address,
+      ...growth,
+    };
+  });
+
+  const analyzed = await analyzePlaces(places);
+  const scored = scoreHiddenGems(analyzed);
+
+  if (scored.length === 0) return;
+
+  const curated = await selectHiddenGems(scored, city.name);
+
+  await db.$transaction([
+    db.curatedPlace.deleteMany({ where: { citySlug: city.slug, category: "hidden_gem" } }),
+    db.curatedPlace.createMany({
+      data: curated.map((e) => ({
+        placeId: e.placeId,
+        citySlug: city.slug,
+        category: "hidden_gem",
         name: e.name,
         rating: e.rating,
         reviewCount: e.reviewCount,

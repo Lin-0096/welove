@@ -22,12 +22,13 @@ const dict = {
   en: {
     bestPlaces: "Best Places",
     subtitle: (city: string) => `The best spots in ${city}, updated daily`,
-    tabs: { cafe: "Cafés", bar: "Bars", restaurant: "Restaurants", curated: "People Love" },
+    tabs: { cafe: "Cafés", bar: "Bars", restaurant: "Restaurants", curated: "People Love", hiddenGems: "Hidden Gems" },
     sections: {
       cafe:       { title: (c: string) => `Top Cafés in ${c}`,       sub: "Highest rated cafés" },
       bar:        { title: (c: string) => `Top Bars in ${c}`,        sub: "Highest rated bars" },
       restaurant: { title: (c: string) => `Top Restaurants in ${c}`, sub: "Highest rated restaurants" },
       curated:    { title: (c: string) => `People Love · ${c}`,      sub: "The best spots across all types — quality, vibe & uniqueness" },
+      hiddenGems: { title: (c: string) => `Hidden Gems · ${c}`,      sub: "Under-the-radar spots locals keep to themselves" },
     },
     backBy: "Back by",
     tomorrow: "tomorrow",
@@ -69,12 +70,13 @@ const dict = {
   fi: {
     bestPlaces: "Parhaat Paikat",
     subtitle: (city: string) => `Parhaat paikat – ${city}, päivitetään päivittäin`,
-    tabs: { cafe: "Kahvilat", bar: "Baarit", restaurant: "Ravintolat", curated: "Suosikit" },
+    tabs: { cafe: "Kahvilat", bar: "Baarit", restaurant: "Ravintolat", curated: "Suosikit", hiddenGems: "Piilokohde" },
     sections: {
       cafe:       { title: (c: string) => `Parhaat kahvilat – ${c}`,    sub: "Korkeimmin arvioidut kahvilat" },
       bar:        { title: (c: string) => `Parhaat baarit – ${c}`,      sub: "Korkeimmin arvioidut baarit" },
       restaurant: { title: (c: string) => `Parhaat ravintolat – ${c}`,  sub: "Korkeimmin arvioidut ravintolat" },
       curated:    { title: (c: string) => `Suosikit · ${c}`,            sub: "Parhaat paikat joka kategoriasta – laatu, tunnelma & persoonallisuus" },
+      hiddenGems: { title: (c: string) => `Piilokohde · ${c}`,          sub: "Paikallisten salaisuudet — vähemmän tunnetut, mutta huikeat paikat" },
     },
     backBy: "Palaa ennen",
     tomorrow: "huomenna",
@@ -116,12 +118,13 @@ const dict = {
   zh: {
     bestPlaces: "最佳地点",
     subtitle: (city: string) => `${city}精选好去处，每日更新`,
-    tabs: { cafe: "咖啡馆", bar: "酒吧", restaurant: "餐厅", curated: "大家都爱" },
+    tabs: { cafe: "咖啡馆", bar: "酒吧", restaurant: "餐厅", curated: "大家都爱", hiddenGems: "小众宝藏" },
     sections: {
       cafe:       { title: (c: string) => `${c}最佳咖啡馆`,   sub: "评分最高的咖啡馆" },
       bar:        { title: (c: string) => `${c}最佳酒吧`,     sub: "评分最高的酒吧" },
       restaurant: { title: (c: string) => `${c}最佳餐厅`,     sub: "评分最高的餐厅" },
       curated:    { title: (c: string) => `大家都爱 · ${c}`,  sub: "跨品类精选 — 品质、氛围与特色兼具" },
+      hiddenGems: { title: (c: string) => `小众宝藏 · ${c}`,  sub: "本地人私藏的低调好去处" },
     },
     backBy: "回机场时间",
     tomorrow: "明天",

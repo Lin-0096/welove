@@ -15,6 +15,7 @@ const CACHE_TTL = 5 * 60 * 1000;
 interface Props {
   citySlug: string;
   locale: Locale;
+  endpoint?: string; // defaults to /api/curated
 }
 
 function tagClass(highlighted: boolean): string {
@@ -24,9 +25,9 @@ function tagClass(highlighted: boolean): string {
   return "text-muted-foreground border-border/60";
 }
 
-export function CuratedList({ citySlug, locale }: Props) {
+export function CuratedList({ citySlug, locale, endpoint = "/api/curated" }: Props) {
   const t = getT(locale);
-  const cacheKey = `${citySlug}:${locale}`;
+  const cacheKey = `${endpoint}:${citySlug}:${locale}`;
   const cached = cache.get(cacheKey);
   const hasValidCache = cached && Date.now() - cached.ts < CACHE_TTL;
 
@@ -36,7 +37,7 @@ export function CuratedList({ citySlug, locale }: Props) {
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    const key = `${citySlug}:${locale}`;
+    const key = `${endpoint}:${citySlug}:${locale}`;
     const hit = cache.get(key);
     if (hit && Date.now() - hit.ts < CACHE_TTL) {
       setPlaces(hit.places);
@@ -50,7 +51,7 @@ export function CuratedList({ citySlug, locale }: Props) {
 
     setLoading(true);
     setError(null);
-    fetch(`/api/curated?city=${citySlug}&locale=${locale}`, { signal: controller.signal })
+    fetch(`${endpoint}?city=${citySlug}&locale=${locale}`, { signal: controller.signal })
       .then((r) => r.json())
       .then((data) => {
         if (data.error) throw new Error(data.error);
@@ -65,7 +66,7 @@ export function CuratedList({ citySlug, locale }: Props) {
       });
 
     return () => controller.abort();
-  }, [citySlug, locale]);
+  }, [citySlug, locale, endpoint]);
 
   if (loading) return <LoadingSkeleton label={t.loadingPlaces} />;
   if (error) return <ErrorState message={t.errorCurated} />;
