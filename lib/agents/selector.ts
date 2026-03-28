@@ -17,11 +17,11 @@ export async function selectHiddenGems(scored: ScoredPlace[], cityName: string):
 
   const response = await client.messages.create({
     model: "MiniMax-M2.7",
-    max_tokens: 4096,
+    max_tokens: 8192,
     tools: [
       {
         name: "submit_hidden_gems",
-        description: "Submit the final hidden gems list",
+        description: "Submit the final hidden gems list. Call this tool immediately with your selections — do not explain your reasoning first.",
         input_schema: {
           type: "object" as const,
           properties: {
