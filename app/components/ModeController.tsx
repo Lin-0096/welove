@@ -28,6 +28,7 @@ export function ModeController({ city, locale }: Props) {
         <LayoverTimer
           backByLabel={t.backBy}
           tomorrowLabel={t.tomorrow}
+          clearLabel={t.clearLayover}
           onMinutesChange={setAvailableMinutes}
         />
       </div>

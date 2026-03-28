@@ -33,10 +33,11 @@ const STORAGE_KEY = "layover-return-time";
 interface Props {
   backByLabel: string;
   tomorrowLabel: string;
+  clearLabel: string;
   onMinutesChange?: (minutes: number | null) => void;
 }
 
-export function LayoverTimer({ backByLabel, tomorrowLabel, onMinutesChange }: Props) {
+export function LayoverTimer({ backByLabel, tomorrowLabel, clearLabel, onMinutesChange }: Props) {
   const [targetTime, setTargetTime] = useState("");
   const [countdown, setCountdown] = useState<Countdown | null>(null);
 
@@ -71,6 +72,11 @@ export function LayoverTimer({ backByLabel, tomorrowLabel, onMinutesChange }: Pr
     }
   };
 
+  const handleClear = () => {
+    setTargetTime("");
+    localStorage.removeItem(STORAGE_KEY);
+  };
+
   return (
     <div className="flex items-center gap-3 flex-wrap">
       <label
@@ -87,16 +93,22 @@ export function LayoverTimer({ backByLabel, tomorrowLabel, onMinutesChange }: Pr
         className="bg-transparent text-sm font-medium text-foreground border-b border-border focus:outline-none focus:ring-1 focus:ring-brand focus:ring-offset-1 rounded-none"
       />
       {countdown && (
-        <span
-          className="font-display text-2xl font-bold tabular-nums leading-none"
-        >
-          {countdown.display}
-          {countdown.tomorrow && (
-            <span className="ml-1.5 text-xs font-sans font-medium text-muted-foreground align-middle">
-              {tomorrowLabel}
-            </span>
-          )}
-        </span>
+        <>
+          <span className="font-display text-2xl font-bold tabular-nums leading-none">
+            {countdown.display}
+            {countdown.tomorrow && (
+              <span className="ml-1.5 text-xs font-sans font-medium text-muted-foreground align-middle">
+                {tomorrowLabel}
+              </span>
+            )}
+          </span>
+          <button
+            onClick={handleClear}
+            className="text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors underline underline-offset-2 min-h-[44px] px-1"
+          >
+            {clearLabel}
+          </button>
+        </>
       )}
     </div>
   );
