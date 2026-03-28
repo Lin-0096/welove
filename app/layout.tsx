@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
+import { isValidLocale, HTML_LANG } from "@/lib/i18n";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,14 +25,19 @@ export const metadata: Metadata = {
   description: "The best cafés, bars & restaurants in Helsinki, Tampere, Turku, Espoo and Oulu — curated daily for locals and visitors",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") ?? "/";
+  const firstSegment = pathname.split("/")[1];
+  const lang = isValidLocale(firstSegment) ? HTML_LANG[firstSegment] : "en";
+
   return (
     <html
-      lang="en"
+      lang={lang}
       className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">

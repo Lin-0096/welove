@@ -62,6 +62,14 @@ const dict = {
       walkMin: (m: number) => `${m} min walk`,
       eligibleCount: (n: number) => `${n} places fit your window`,
     },
+    trending: {
+      loadingLabel: "Loading trending spots",
+      noDataYet: "Not enough data yet",
+      noDataBody: "Trending data accumulates over time. Check back in a few days once snapshots have been collected.",
+      noSpotsYet: "No trending spots yet",
+      noSpotsBody: "Trending data will appear as more snapshots are collected.",
+      loadingError: "Failed to load trending data",
+    },
     typeMap: {
       cafe: "Café", coffee_shop: "Coffee", bar: "Bar", restaurant: "Restaurant",
       sauna: "Sauna", bakery: "Bakery", brewery: "Brewery", wine_bar: "Wine Bar",
@@ -119,6 +127,14 @@ const dict = {
       walkMin: (m: number) => `${m} min kävely`,
       eligibleCount: (n: number) => `${n} paikkaa sopii aikaasi`,
     },
+    trending: {
+      loadingLabel: "Ladataan nousevia paikkoja",
+      noDataYet: "Ei tarpeeksi dataa vielä",
+      noDataBody: "Trendidataa kertyy ajan myötä. Tule takaisin muutaman päivän kuluttua.",
+      noSpotsYet: "Ei nousevia paikkoja vielä",
+      noSpotsBody: "Trenditieto ilmestyy, kun enemmän tilannekuvia on kerätty.",
+      loadingError: "Trendidatan lataus epäonnistui",
+    },
     typeMap: {
       cafe: "Kahvila", coffee_shop: "Kahvi", bar: "Baari", restaurant: "Ravintola",
       sauna: "Sauna", bakery: "Leipomo", brewery: "Panimo", wine_bar: "Viinibaari",
@@ -175,6 +191,14 @@ const dict = {
       noFit: "时间窗口内暂无合适地点",
       walkMin: (m: number) => `步行${m}分钟`,
       eligibleCount: (n: number) => `${n} 个地点可纳入行程`,
+    },
+    trending: {
+      loadingLabel: "加载趋势地点中",
+      noDataYet: "数据暂时不足",
+      noDataBody: "趋势数据会随时间积累，请几天后再来查看。",
+      noSpotsYet: "暂无趋势地点",
+      noSpotsBody: "随着更多快照被收集，趋势数据将陆续出现。",
+      loadingError: "无法加载趋势数据",
     },
     typeMap: {
       cafe: "咖啡馆", coffee_shop: "咖啡", bar: "酒吧", restaurant: "餐厅",
