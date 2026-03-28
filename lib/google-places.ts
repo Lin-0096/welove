@@ -193,6 +193,15 @@ function dedupe(places: Place[]): Place[] {
   });
 }
 
+// Types that are always excluded from the discover/People Love list.
+// welove is a food, drink, and local culture guide — not a shopping or lifestyle directory.
+const DISCOVER_EXCLUDED_TYPES = new Set([
+  "shopping_mall", "department_store", "clothing_store", "shoe_store",
+  "supermarket", "grocery_store", "gas_station", "parking",
+  "event_venue", "convention_center", "stadium", "gym",
+  "bowling_alley", "movie_theater", "casino",
+]);
+
 /**
  * Discover algorithm: cast a wide net across many place types,
  * then rank purely by review count — the clearest signal of mainstream popularity.
@@ -200,7 +209,7 @@ function dedupe(places: Place[]): Place[] {
  */
 export function applyDiscoverAlgorithm(pool: Place[]): Place[] {
   return pool
-    .filter((p) => p.rating >= 3.5 && p.reviewCount > 0)
+    .filter((p) => p.rating >= 3.5 && p.reviewCount > 0 && !DISCOVER_EXCLUDED_TYPES.has(p.primaryType))
     .sort((a, b) => b.reviewCount - a.reviewCount)
     .slice(0, DISCOVER_TARGET);
 }
