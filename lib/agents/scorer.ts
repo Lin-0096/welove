@@ -1,6 +1,10 @@
 import { AnalyzedPlace, ScoredPlace } from "./types";
 
-const BAYESIAN_M = 300; // minimum review threshold
+// Higher M = stronger pull toward mean for low-review places
+const BAYESIAN_M = 2000;
+
+// log-scale popularity: 50k+ reviews = full 10 pts
+const POPULARITY_MAX_REVIEWS = 50000;
 
 // Bayesian average: pulls low-review places toward the global mean
 function bayesianRating(rating: number, reviewCount: number, globalMean: number): number {
@@ -13,6 +17,12 @@ function growthScore(delta: number): number {
   return Math.min(Math.max(delta, 0) / 50, 1);
 }
 
+// Log-normalized popularity: rewards places everyone has heard of
+function popularityScore(reviewCount: number): number {
+  if (reviewCount <= 0) return 0;
+  return Math.min(Math.log10(reviewCount) / Math.log10(POPULARITY_MAX_REVIEWS), 1);
+}
+
 export function scorePlaces(places: AnalyzedPlace[]): ScoredPlace[] {
   const filtered = places.filter((p) => !p.redFlag && p.rating >= 3.5 && p.reviewCount >= 200);
 
@@ -23,9 +33,12 @@ export function scorePlaces(places: AnalyzedPlace[]): ScoredPlace[] {
 
   return filtered
     .map((p) => {
-      // Quality: 80 pts — Bayesian-adjusted rating (primary signal)
+      // Quality: 70 pts — Bayesian-adjusted rating (primary signal)
       const bRating = bayesianRating(p.rating, p.reviewCount, globalMean);
-      const quality = (bRating / 5) * 80;
+      const quality = (bRating / 5) * 70;
+
+      // Popularity: 10 pts — log-scaled review count ("how mainstream is this place")
+      const popularity = popularityScore(p.reviewCount) * 10;
 
       // Growth: 10 pts — recent momentum
       const growth = growthScore(p.reviewCountDelta) * 10;
@@ -33,7 +46,7 @@ export function scorePlaces(places: AnalyzedPlace[]): ScoredPlace[] {
       // Semantic: 10 pts — AI uniqueness + appeal (tiebreaker only)
       const semantic = ((p.uniqueness + p.appeal) / 20) * 10;
 
-      const score = Math.round(quality + growth + semantic);
+      const score = Math.round(quality + popularity + growth + semantic);
 
       return { ...p, score };
     })

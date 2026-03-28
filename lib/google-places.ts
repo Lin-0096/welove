@@ -24,17 +24,29 @@ const CATEGORY_QUERY: Record<PlaceCategory, string> = {
   restaurant: "restaurants",
 };
 
-// Type groups for discover — split across batches to maximise pool size
+// Wide type batches for discover — cast a broad net, then rank by popularity
+// Google Places API: max 20 results per call, max 50 types per request
 const DISCOVER_TYPE_BATCHES = [
-  ["restaurant", "cafe", "bar"],
-  ["tourist_attraction", "museum", "art_gallery"],
-  ["night_club", "bakery", "spa"],
-  ["shopping_mall", "amusement_park", "bowling_alley"],
-  ["park", "aquarium", "zoo"],
+  // Food & drink
+  ["restaurant", "cafe", "bar", "bakery", "brewery", "wine_bar", "cocktail_bar", "pub"],
+  ["fast_food_restaurant", "pizza_restaurant", "hamburger_restaurant", "sushi_restaurant", "ramen_restaurant"],
+  ["seafood_restaurant", "vietnamese_restaurant", "thai_restaurant", "indian_restaurant", "korean_restaurant"],
+  ["chinese_restaurant", "japanese_restaurant", "italian_restaurant", "mexican_restaurant", "night_club"],
+  // Attractions & culture
+  ["tourist_attraction", "museum", "art_gallery", "cultural_center", "performing_arts_theater"],
+  ["historic_site", "monument", "church", "cathedral", "library"],
+  // Nature & outdoor
+  ["park", "national_park", "botanical_garden", "nature_preserve", "wildlife_refuge"],
+  ["beach", "marina", "ski_resort", "hiking_area"],
+  // Entertainment
+  ["amusement_park", "aquarium", "zoo", "bowling_alley", "movie_theater", "casino"],
+  // Wellness & sport
+  ["spa", "gym", "swimming_pool", "sauna", "stadium", "sports_complex"],
+  // Shopping & markets
+  ["shopping_mall", "market", "department_store", "food_court"],
 ];
 
-const DISCOVER_TARGET = 50;
-const RATING_STEP = 0.1;
+const DISCOVER_TARGET = 100;
 
 function mapPlace(raw: Record<string, unknown>): Place {
   const hours = raw.currentOpeningHours as Record<string, unknown> | undefined;
@@ -173,38 +185,15 @@ function dedupe(places: Place[]): Place[] {
 }
 
 /**
- * Smart discover algorithm:
- * 1. Fetch a large pool (~100 places) from multiple type batches
- * 2. Find the max rating in the pool
- * 3. Fill up to TARGET starting from max rating, stepping down by RATING_STEP
- * 4. Sort each rating bucket by reviewCount desc
+ * Discover algorithm: cast a wide net across many place types,
+ * then rank purely by review count — the clearest signal of mainstream popularity.
+ * Min rating 3.5 to filter out genuinely bad places.
  */
 export function applyDiscoverAlgorithm(pool: Place[]): Place[] {
-  const withRating = pool.filter((p) => p.rating > 0);
-  if (withRating.length === 0) return [];
-
-  // Round ratings to 1 decimal
-  const rounded = withRating.map((p) => ({
-    ...p,
-    rating: Math.round(p.rating * 10) / 10,
-  }));
-
-  const maxRating = Math.max(...rounded.map((p) => p.rating));
-
-  const result: Place[] = [];
-  let currentRating = maxRating;
-
-  while (result.length < DISCOVER_TARGET && currentRating >= 1.0) {
-    const bucket = rounded
-      .filter((p) => p.rating === currentRating)
-      .sort((a, b) => b.reviewCount - a.reviewCount);
-
-    const needed = DISCOVER_TARGET - result.length;
-    result.push(...bucket.slice(0, needed));
-    currentRating = Math.round((currentRating - RATING_STEP) * 10) / 10;
-  }
-
-  return result;
+  return pool
+    .filter((p) => p.rating >= 3.5 && p.reviewCount > 0)
+    .sort((a, b) => b.reviewCount - a.reviewCount)
+    .slice(0, DISCOVER_TARGET);
 }
 
 const CATEGORY_TARGET = 100;
