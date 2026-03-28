@@ -104,7 +104,7 @@ Submit exactly ${HIDDEN_GEM_COUNT} places using submit_hidden_gems, ranked best 
 }
 
 const client = new Anthropic();
-const CANDIDATE_MULTIPLIER = 3;
+const CANDIDATE_MULTIPLIER = 2;
 
 export async function selectPlaces(scored: ScoredPlace[], cityName: string, finalCount = 20): Promise<CuratedEntry[]> {
   const candidateCount = finalCount * CANDIDATE_MULTIPLIER;
@@ -182,7 +182,8 @@ Submit exactly ${finalCount} places using submit_curated_list, ranked best first
 
   const toolUse = response.content.find((b) => b.type === "tool_use");
   if (!toolUse || toolUse.type !== "tool_use") {
-    throw new Error("Selector: no tool_use response");
+    const textBlock = response.content.find((b) => b.type === "text");
+    throw new Error(`Selector: no tool_use response. Model said: ${(textBlock as { text?: string })?.text?.slice(0, 200) ?? "(no text)"}`);
   }
 
   const input = toolUse.input as { selected: { placeId: string; reason: string; reasonFi: string; reasonZh: string }[] };
