@@ -30,8 +30,9 @@ export async function GET(request: NextRequest) {
 
     const places = rows
       .filter((p) => !excludedIds.has(p.placeId))
-      .map(({ reasonFi, reasonZh, ...p }) => ({
+      .map(({ reasonFi, reasonZh, ...p }, i) => ({
         ...p,
+        rank: i + 1,
         reason:
           locale === "fi" ? (reasonFi || p.reason) :
           locale === "zh" ? (reasonZh || p.reason) :
