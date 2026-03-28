@@ -46,7 +46,7 @@ const DISCOVER_TYPE_BATCHES = [
   ["shopping_mall", "market"],
 ];
 
-const DISCOVER_TARGET = 100;
+const DISCOVER_TARGET = 50;
 
 function mapPlace(raw: Record<string, unknown>): Place {
   const hours = raw.currentOpeningHours as Record<string, unknown> | undefined;

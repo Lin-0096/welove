@@ -16,7 +16,7 @@ export async function selectHiddenGems(scored: ScoredPlace[], cityName: string):
   }));
 
   const response = await client.messages.create({
-    model: "MiniMax-Text-01",
+    model: "MiniMax-M2.7",
     max_tokens: 8192,
     tools: [
       {
@@ -121,7 +121,7 @@ export async function selectPlaces(scored: ScoredPlace[], cityName: string, fina
   }));
 
   const response = await client.messages.create({
-    model: "MiniMax-Text-01",
+    model: "MiniMax-M2.7",
     max_tokens: 8192,
     tools: [
       {
