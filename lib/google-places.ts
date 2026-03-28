@@ -25,7 +25,7 @@ const CATEGORY_QUERY: Record<PlaceCategory, string> = {
 };
 
 // Wide type batches for discover — cast a broad net, then rank by popularity
-// Google Places API: max 20 results per call, max 50 types per request
+// Google Places API: max 20 results per call, types must be valid Place types
 const DISCOVER_TYPE_BATCHES = [
   // Food & drink
   ["restaurant", "cafe", "bar", "bakery", "brewery", "wine_bar", "cocktail_bar", "pub"],
@@ -34,16 +34,16 @@ const DISCOVER_TYPE_BATCHES = [
   ["chinese_restaurant", "japanese_restaurant", "italian_restaurant", "mexican_restaurant", "night_club"],
   // Attractions & culture
   ["tourist_attraction", "museum", "art_gallery", "cultural_center", "performing_arts_theater"],
-  ["historic_site", "monument", "church", "cathedral", "library"],
+  ["church", "event_venue"],
   // Nature & outdoor
   ["park", "national_park", "botanical_garden", "nature_preserve", "wildlife_refuge"],
-  ["beach", "marina", "ski_resort", "hiking_area"],
+  ["beach", "marina", "ski_resort"],
   // Entertainment
   ["amusement_park", "aquarium", "zoo", "bowling_alley", "movie_theater", "casino"],
   // Wellness & sport
-  ["spa", "gym", "swimming_pool", "sauna", "stadium", "sports_complex"],
+  ["spa", "gym", "swimming_pool", "sauna", "stadium"],
   // Shopping & markets
-  ["shopping_mall", "market", "department_store", "food_court"],
+  ["shopping_mall", "market"],
 ];
 
 const DISCOVER_TARGET = 100;
