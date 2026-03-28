@@ -24,7 +24,7 @@ async function analyzeBatchOnce(places: PlaceInput[]): Promise<AnalysisResult[]>
   }));
 
   const response = await client.messages.create({
-    model: "MiniMax-M2.7-highspeed",
+    model: "MiniMax-Text-01",
     max_tokens: 4096,
     tools: [
       {
