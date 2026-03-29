@@ -130,7 +130,7 @@ function LoadingSkeleton({ label }: { label: string }) {
 
 function ErrorState({ message }: { message: string }) {
   return (
-    <div className="py-12 text-destructive">
+    <div className="py-12 text-destructive" role="alert">
       <p className="font-medium">{message}</p>
     </div>
   );

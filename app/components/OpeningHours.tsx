@@ -88,7 +88,7 @@ export function OpeningHours({ weeklyHours, specialDays, locale }: Props) {
 
         <button
           onClick={() => setShowAll((v) => !v)}
-          className="text-muted-foreground/65 hover:text-muted-foreground transition-colors ml-auto cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-end -mr-2"
+          className="text-muted-foreground/65 hover:text-muted-foreground transition-colors ml-auto cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-end -mr-2 focus:outline-none focus-visible:ring-1 focus-visible:ring-brand focus-visible:ring-offset-1 rounded"
           aria-label={showAll ? h.hideWeekly : h.showWeekly}
         >
           {showAll ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
@@ -107,7 +107,7 @@ export function OpeningHours({ weeklyHours, specialDays, locale }: Props) {
         }`}
       >
         <div className="overflow-hidden min-h-0">
-          <ul className="mt-2 space-y-0.5 text-xs bg-muted/40 rounded-md p-2.5">
+          <ul className="mt-2 space-y-0.5 text-xs bg-muted/60 rounded-md p-2.5">
             {weeklyHours.map((line, i) => (
               <li
                 key={i}

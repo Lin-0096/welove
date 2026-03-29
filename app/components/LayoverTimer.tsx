@@ -104,7 +104,7 @@ export function LayoverTimer({ backByLabel, tomorrowLabel, clearLabel, onMinutes
           </span>
           <button
             onClick={handleClear}
-            className="text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors underline underline-offset-2 min-h-[44px] px-1"
+            className="text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors underline underline-offset-2 min-h-[44px] px-1 focus:outline-none focus-visible:ring-1 focus-visible:ring-brand focus-visible:ring-offset-1 rounded"
           >
             {clearLabel}
           </button>

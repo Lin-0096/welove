@@ -58,6 +58,7 @@ export function LayoverPlanner({ citySlug, locale, availableMinutes }: Props) {
 
   const [all, setAll] = useState<Candidate[]>(hasValid ? cached.places : []);
   const [loading, setLoading] = useState(!hasValid);
+  const [error, setError] = useState<boolean>(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -68,6 +69,7 @@ export function LayoverPlanner({ citySlug, locale, availableMinutes }: Props) {
       return;
     }
     setLoading(true);
+    setError(false);
     fetch(`/api/layover-candidates?city=${citySlug}&locale=${locale}`)
       .then((r) => r.json())
       .then((data) => {
@@ -75,7 +77,7 @@ export function LayoverPlanner({ citySlug, locale, availableMinutes }: Props) {
         cacheSet(cacheKey, { places, ts: Date.now() });
         setAll(places);
       })
-      .catch(() => {})
+      .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, [citySlug, locale]);
 
@@ -131,6 +133,14 @@ export function LayoverPlanner({ citySlug, locale, availableMinutes }: Props) {
           <div key={i} className="h-20 bg-muted/60 motion-safe:animate-pulse rounded-lg" aria-hidden="true" />
         ))}
         <span className="sr-only">{t.loading}</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mt-8 py-12 text-destructive" role="alert">
+        <p className="font-medium">{t.errorPlace}</p>
       </div>
     );
   }
@@ -220,7 +230,7 @@ export function LayoverPlanner({ citySlug, locale, availableMinutes }: Props) {
           </ul>
 
           {/* Time budget footer */}
-          <div className="sticky bottom-0 mt-6 pb-4 pt-3 bg-background border-t border-border/60">
+          <div className="sm:sticky sm:bottom-0 mt-6 pb-4 pt-3 bg-background border-t border-border/60">
             <p
               id="budget-label"
               className={`text-xs mb-2 transition-colors ${budgetPct > 90 ? "text-destructive font-medium" : "text-muted-foreground"}`}

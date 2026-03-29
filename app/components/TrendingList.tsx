@@ -10,20 +10,43 @@ interface Props {
   locale: Locale;
 }
 
+// Module-level cache: persists across tab switches in the same session.
+// Key: "city", TTL: 5 minutes, max 10 entries.
+const cache = new Map<string, { entries: GrowthEntry[]; insufficientData: boolean; ts: number }>();
+const CACHE_TTL = 5 * 60 * 1000;
+const MAX_CACHE_SIZE = 10;
+
+function cacheSet(key: string, value: { entries: GrowthEntry[]; insufficientData: boolean; ts: number }) {
+  if (cache.size >= MAX_CACHE_SIZE) cache.delete(cache.keys().next().value!);
+  cache.set(key, value);
+}
+
 export function TrendingList({ citySlug, locale }: Props) {
   const t = getT(locale);
-  const [entries, setEntries] = useState<GrowthEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [insufficientData, setInsufficientData] = useState(false);
+  const cacheKey = citySlug;
+  const cached = cache.get(cacheKey);
+  const hasValidCache = cached && Date.now() - cached.ts < CACHE_TTL;
+
+  const [entries, setEntries] = useState<GrowthEntry[]>(hasValidCache ? cached.entries : []);
+  const [loading, setLoading] = useState(!hasValidCache);
+  const [insufficientData, setInsufficientData] = useState(hasValidCache ? cached.insufficientData : false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const hit = cache.get(cacheKey);
+    if (hit && Date.now() - hit.ts < CACHE_TTL) {
+      setEntries(hit.entries);
+      setInsufficientData(hit.insufficientData);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     fetch(`/api/growth?city=${citySlug}&days=30`)
       .then((r) => r.json())
       .then((data) => {
         if (data.error) throw new Error(data.error);
+        cacheSet(cacheKey, { entries: data.entries, insufficientData: data.insufficientData, ts: Date.now() });
         setEntries(data.entries);
         setInsufficientData(data.insufficientData);
       })
@@ -122,7 +145,7 @@ function LoadingSkeleton({ label, srLabel }: { label: string; srLabel: string })
 
 function ErrorState({ heading }: { heading: string }) {
   return (
-    <div className="py-12 text-destructive">
+    <div className="py-12 text-destructive" role="alert">
       <p className="font-medium">{heading}</p>
     </div>
   );
