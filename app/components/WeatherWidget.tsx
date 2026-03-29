@@ -9,15 +9,29 @@ interface WeatherData {
   weatherCode: number;
 }
 
+// Module-level cache: 10-minute TTL keyed by city slug.
+// Prevents re-fetching on every tab switch / remount.
+const cache = new Map<string, { data: WeatherData; ts: number }>();
+const CACHE_TTL = 10 * 60 * 1000;
+
 interface Props {
   city: CityConfig;
   locale: Locale;
 }
 
 export function WeatherWidget({ city, locale }: Props) {
-  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const cached = cache.get(city.slug);
+  const hasValid = cached && Date.now() - cached.ts < CACHE_TTL;
+
+  const [weather, setWeather] = useState<WeatherData | null>(hasValid ? cached.data : null);
 
   useEffect(() => {
+    const hit = cache.get(city.slug);
+    if (hit && Date.now() - hit.ts < CACHE_TTL) {
+      setWeather(hit.data);
+      return;
+    }
+
     const controller = new AbortController();
     const { latitude, longitude } = city.center;
     fetch(
@@ -26,10 +40,12 @@ export function WeatherWidget({ city, locale }: Props) {
     )
       .then((r) => r.json())
       .then((data) => {
-        setWeather({
+        const weather: WeatherData = {
           temperature: Math.round(data.current.temperature_2m),
           weatherCode: data.current.weather_code,
-        });
+        };
+        cache.set(city.slug, { data: weather, ts: Date.now() });
+        setWeather(weather);
       })
       .catch((err) => {
         if (err.name !== "AbortError") console.error("Weather fetch failed", err);
