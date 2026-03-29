@@ -90,7 +90,7 @@ export function LayoverTimer({ backByLabel, tomorrowLabel, clearLabel, onMinutes
         type="time"
         value={targetTime}
         onChange={handleChange}
-        className="bg-transparent text-sm font-medium text-foreground border-b border-border focus:outline-none focus:ring-1 focus:ring-brand focus:ring-offset-1 rounded-none"
+        className="bg-transparent text-sm font-medium text-foreground border-b border-border focus:outline-none focus:ring-1 focus:ring-brand focus:ring-offset-1 rounded-none min-h-[44px]"
       />
       {countdown && (
         <>

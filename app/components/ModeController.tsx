@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Coffee, Wine, Utensils, Heart, Sparkles } from "lucide-react";
+import { Coffee, Wine, Utensils, Heart, Gem } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlaceList } from "./PlaceList";
 import { CuratedList } from "./CuratedList";
@@ -79,7 +79,7 @@ export function ModeController({ city, locale }: Props) {
                   value="hidden-gems"
                   className="flex-1 min-[480px]:gap-1 rounded-none px-1.5 pb-2.5 text-xs min-[480px]:text-sm"
                 >
-                  <Sparkles className="size-3.5 shrink-0" aria-hidden="true" />
+                  <Gem className="size-3.5 shrink-0" aria-hidden="true" />
                   <span className="max-[479px]:sr-only">{t.tabs.hiddenGems}</span>
                 </TabsTrigger>
               )}
