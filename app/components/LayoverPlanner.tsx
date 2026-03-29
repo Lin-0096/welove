@@ -168,7 +168,7 @@ export function LayoverPlanner({ citySlug, locale, availableMinutes }: Props) {
                   <button
                     onClick={() => toggle(place.placeId)}
                     aria-pressed={isSelected}
-                    className={`w-full text-left flex items-start gap-3 px-3 py-3.5 rounded-lg transition-colors -mx-3 ${
+                    className={`w-full text-left flex items-start gap-3 px-3 py-3.5 rounded-lg transition-colors -mx-3 focus:outline-none focus-visible:ring-1 focus-visible:ring-brand focus-visible:ring-offset-1 ${
                       isSelected
                         ? "bg-brand/8 [box-shadow:inset_2px_0_0_var(--color-brand)]"
                         : "hover:bg-muted/50"
@@ -221,16 +221,20 @@ export function LayoverPlanner({ citySlug, locale, availableMinutes }: Props) {
 
           {/* Time budget footer */}
           <div className="sticky bottom-0 mt-6 pb-4 pt-3 bg-background border-t border-border/60">
-            <p className={`text-xs mb-2 ${budgetPct > 90 ? "text-destructive font-medium" : "text-muted-foreground"}`}>
+            <p
+              id="budget-label"
+              className={`text-xs mb-2 transition-colors ${budgetPct > 90 ? "text-destructive font-medium" : "text-muted-foreground"}`}
+            >
               {t.layover.selectedTime(totalUsedMinutes, availableMinutes)}
             </p>
             <div className="h-px bg-muted overflow-hidden">
               <div
-                className={`h-full w-full origin-left transition-[transform,background-color] duration-300 ${
+                className={`h-full w-full origin-left motion-safe:transition-[transform,background-color] motion-safe:duration-300 ${
                   budgetPct > 90 ? "bg-destructive" : "bg-brand"
                 }`}
                 style={{ transform: `scaleX(${budgetPct / 100})` }}
                 role="progressbar"
+                aria-labelledby="budget-label"
                 aria-valuemin={0}
                 aria-valuenow={totalUsedMinutes}
                 aria-valuemax={availableMinutes}

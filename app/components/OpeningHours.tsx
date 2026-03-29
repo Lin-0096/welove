@@ -101,22 +101,28 @@ export function OpeningHours({ weeklyHours, specialDays, locale }: Props) {
         </p>
       )}
 
-      {showAll && (
-        <ul className="mt-2 space-y-0.5 text-xs bg-muted/40 rounded-md p-2.5">
-          {weeklyHours.map((line, i) => (
-            <li
-              key={i}
-              className={
-                i === todayGoogleIdx
-                  ? "font-medium text-foreground"
-                  : "text-muted-foreground"
-              }
-            >
-              {line}
-            </li>
-          ))}
-        </ul>
-      )}
+      <div
+        className={`grid motion-safe:transition-[grid-template-rows] motion-safe:duration-200 ${
+          showAll ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
+      >
+        <div className="overflow-hidden min-h-0">
+          <ul className="mt-2 space-y-0.5 text-xs bg-muted/40 rounded-md p-2.5">
+            {weeklyHours.map((line, i) => (
+              <li
+                key={i}
+                className={
+                  i === todayGoogleIdx
+                    ? "font-medium text-foreground"
+                    : "text-muted-foreground"
+                }
+              >
+                {line}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }

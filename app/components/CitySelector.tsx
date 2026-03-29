@@ -20,7 +20,7 @@ export function CitySelector({ currentSlug, locale }: Props) {
           onClick={() => router.push(`/${locale}/${city.slug}`)}
           aria-current={city.slug === currentSlug ? "page" : undefined}
           className={[
-            "px-4 py-2.5 min-h-[44px] rounded-full text-sm font-medium transition-colors shrink-0 whitespace-nowrap",
+            "px-4 py-2.5 min-h-[44px] rounded-full text-sm font-medium transition-colors shrink-0 whitespace-nowrap focus:outline-none focus-visible:ring-1 focus-visible:ring-brand focus-visible:ring-offset-1",
             city.slug === currentSlug
               ? "bg-brand text-brand-foreground shadow-sm"
               : "bg-card text-muted-foreground border border-border hover:text-foreground hover:border-foreground/30",
