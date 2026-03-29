@@ -29,6 +29,7 @@ export function ModeController({ city, locale }: Props) {
           backByLabel={t.backBy}
           tomorrowLabel={t.tomorrow}
           clearLabel={t.clearLayover}
+          countdownLabel={t.timeRemaining}
           onMinutesChange={setAvailableMinutes}
         />
       </div>

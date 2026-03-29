@@ -157,6 +157,11 @@ export function LayoverPlanner({ citySlug, locale, availableMinutes }: Props) {
             {t.layover.eligibleCount(eligible.length)}
           </p>
         )}
+        {selectedList.length > 0 && (
+          <p className={`text-xs mt-1 sm:hidden ${budgetPct > 90 ? "text-destructive font-medium" : "text-muted-foreground"}`}>
+            {t.layover.selectedTime(totalUsedMinutes, availableMinutes)}
+          </p>
+        )}
       </div>
 
       {eligible.length === 0 ? (

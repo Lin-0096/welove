@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function pad(n: number) {
   return String(n).padStart(2, "0");
@@ -34,12 +34,14 @@ interface Props {
   backByLabel: string;
   tomorrowLabel: string;
   clearLabel: string;
+  countdownLabel: string;
   onMinutesChange?: (minutes: number | null) => void;
 }
 
-export function LayoverTimer({ backByLabel, tomorrowLabel, clearLabel, onMinutesChange }: Props) {
+export function LayoverTimer({ backByLabel, tomorrowLabel, clearLabel, countdownLabel, onMinutesChange }: Props) {
   const [targetTime, setTargetTime] = useState("");
   const [countdown, setCountdown] = useState<Countdown | null>(null);
+  const prevMinutesRef = useRef<number | null | undefined>(undefined);
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -49,13 +51,20 @@ export function LayoverTimer({ backByLabel, tomorrowLabel, clearLabel, onMinutes
   useEffect(() => {
     if (!targetTime) {
       setCountdown(null);
-      onMinutesChange?.(null);
+      if (prevMinutesRef.current !== null) {
+        prevMinutesRef.current = null;
+        onMinutesChange?.(null);
+      }
       return;
     }
     const tick = () => {
       const c = computeCountdown(targetTime);
       setCountdown(c);
-      onMinutesChange?.(c ? c.totalMinutes : null);
+      const minutes = c ? c.totalMinutes : null;
+      if (minutes !== prevMinutesRef.current) {
+        prevMinutesRef.current = minutes;
+        onMinutesChange?.(minutes);
+      }
     };
     tick();
     const id = setInterval(tick, 1000);
@@ -94,7 +103,10 @@ export function LayoverTimer({ backByLabel, tomorrowLabel, clearLabel, onMinutes
       />
       {countdown && (
         <>
-          <span className="font-display text-2xl font-bold tabular-nums leading-none">
+          <span
+            className="font-display text-2xl font-bold tabular-nums leading-none"
+            aria-label={`${countdownLabel}: ${countdown.display}`}
+          >
             {countdown.display}
             {countdown.tomorrow && (
               <span className="ml-1.5 text-xs font-sans font-medium text-muted-foreground align-middle">
